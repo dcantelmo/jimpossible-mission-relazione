@@ -1,0 +1,268 @@
+% Basic LaTeX boilerplate for a report/article
+\documentclass[11pt,a4paper]{article}
+
+% Language and encoding
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[italian]{babel}
+
+% Common packages
+\usepackage{lmodern}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath, amssymb}
+\usepackage{hyperref}
+\usepackage{csquotes}
+\usepackage{booktabs}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{forest}
+\usepackage{listings}
+\lstset{
+    language=Java,
+    basicstyle=\ttfamily\small,
+    numbers=left,
+    numberstyle=\tiny,
+    frame=single,
+    breaklines=true,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    stringstyle=\color{red}
+}
+
+% Page geometry
+\geometry{margin=2.5cm}
+
+% Metadata
+\title{{\Huge Progetto: JImpossible Mission}}
+\author{Daniele Cantelmo\\Matricola 1815100\\Teledidattica}
+\date{Corso di Metodologie di Programmazione\\\today}
+
+\begin{document}
+\maketitle
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/main.jpg}
+\end{figure}
+\newpage
+\tableofcontents
+\newpage
+
+\section{Introduzione}
+Il documento descrive il progetto \textbf{JImpossible Mission}, un progetto didattico che consiste nella realizzazione di un videogioco
+in Java basata sul classico gioco per Commodore 64 "Impossible Mission". 
+\newline
+\newline
+Il videogioco è un platform 2D in cui il giocatore controlla un agente segreto infiltrato in una base nemica. 
+Lo scopo del giocatore è quello di cercare e raccogliere, all'interno della base, tutti i frammenti di schede perforate disperse
+e nascoste all'interno degli oggetti discena. Una volta raccolti tutti i frammenti sarà possibile decifrare il codice di accesso alla 
+stanza di controllo e terminare la missione una volta raggiunta la porta.
+\newline
+\newline
+Il gioco presenta varie meccaniche fondamentali, che definiscono il modo in cui il giocatore interagisce con l'ambiente di gioco e le sfide che deve affrontare.
+Tra queste meccaniche principali troviamo:
+\begin{itemize}
+    \item Controllo del personaggio principale tramite tastiera
+    \item Nemici con IA semplice
+    \item Interazione con oggetti collezionabili e dispositivi (PC, ascensori)
+    \item Gestione delle collisioni tra entità
+    \item Ascensori
+    \item Suoni e animazioni
+\end{itemize}
+Il gioco è stato sviluppato utilizzando Java, con versione di riferimento JDK 22.
+Per la gestione dei menù, della grafica e delle animazioni è stata utilizzata la libreria Java Swing
+
+I requisiti funzionali del progetto riguardano principalmente:
+\begin{itemize}
+    \item Impiego del pattern strutturale MVC (Model-View-Controller)
+    \item Mondo di gioco dinamico, con entità in movimento, animazioni e suoni
+    \item Ostacoli e nemici da evitare
+    \item Gestione dei profili utente e persistenza dei punteggi
+    \item Oggetti da raccogliere e utilizzare (Freeze, Reset ascensori ecc.)
+\end{itemize}
+
+Il gioco è stato sviluppato con l'idea di sfruttare e adottare svariati pattern di progettazione del 
+software per poterne conoscere punti di forza e limiti, oltre che per rendere il codice più lineare e manutenibile.
+Inoltre è stata posta particolare attenzione alla separazione delle responsabilità tra le varie componenti del pattern MVC ed è stata
+promossa la modularità del codice che ha facilitato l'estensione del progetto con funzionalità aggiuntive.
+
+\subsection{Panoramica dell'architettura}
+L'architettura di \textbf{JImpossible Mission} è organizzata come segue:
+\begin{itemize}
+    \item \textbf{Model}: è il cuore del progetto. Gestisce le logiche del gioco, le interazioni tra le entità e rappresenta lo stato del mondo di gioco. \\[2pt]
+    \textit{Subpackages}: \texttt{entity}, \texttt{manager}, \texttt{physics}, \texttt{game}, \texttt{scene}, \texttt{item}, \texttt{profile}.
+    \item \textbf{View}: si occupa della rappresentazione grafica utilizzando coma base \textbf{Java Swing}, estendendone i componenti. Gestisce le interfacce dei menù, le animazioni e gli effetti audio del gioco \\[2pt]
+    \textit{Subpackages}: \texttt{animation}, \texttt{audio}, \texttt{color}, \texttt{hud}, \texttt{item}, \texttt{menu}, \texttt{ui}.
+    \item \textbf{Controller}: riceve gli input da tastiera (tramite \texttt{InputController}), li normalizza in comandi di gioco (azioni) e li passa al Model. Contiene inoltre il \textbf{game loop}, che scandisce l'aggiornamento periodico dello stato del gioco.
+\end{itemize}
+
+\subsection{Principali componenti}
+A livello di package, l'architettura è organizzata in:
+\begin{itemize}
+    \item \textbf{Controller}: gestione del ciclo di gioco, input da tastiera, cambio scena e coordinamento tra Model e View.
+    \item \textbf{Model}: definizione delle entità (player, nemici, oggetti, ascensori), gestione delle collisioni e delle interazioni, logica dei nemici e del punteggio, timer di gioco.
+    \item \textbf{View}: pannelli grafici Swing, rendering delle scene, gestione delle animazioni e dell'HUD.
+    \item \textbf{Audio / Risorse}: caricamento e riproduzione dei suoni, gestione delle sprite e delle immagini.
+    \item \textbf{Persistenza}: gestione dei profili utente e salvataggio dei punteggi su file.
+\end{itemize}
+
+\subsection{Flusso di esecuzione}
+Il flusso principale del gioco è il seguente:
+\begin{enumerate}
+    \item Il \textbf{Controller} esegue il \textit{game loop} e, ad ogni iterazione, legge lo stato corrente degli input (\texttt{InputController}).
+    \item Gli input vengono trasformati in \textbf{azioni} di gioco (es. movimento a sinistra, salto, interazione) e passati al \textbf{Model}.
+    \item Il \textbf{Model} aggiorna lo stato del mondo di gioco: posizione delle entità, collisioni, timer, stato dei nemici, gestione degli oggetti collezionabili.
+    \item Il \textbf{Model}, estendendo \texttt{Observable}, notifica le \textbf{View}, che ridisegnano la scena corrente e l'HUD.
+\end{enumerate}
+Il gioco presenta le seguenti funzionalità:
+
+\begin{itemize}
+    \item Ciclo di gioco (Game loop)
+    \item Motore fisico (semplice, per il player)
+    \item Controllo del personaggio da tastiera
+    \item Nemici con IA (semplice)
+    \item Ostacoli per il personaggio
+    \item Gestione delle collisioni
+    \item Interazioni con oggetti (collezionabili, uso del PC, porta d'uscita, ascensori)
+    \item Cambi di scena
+    \item Suoni per stato e per frame
+    \item Animazioni
+    \item HUD
+\end{itemize}
+
+\section{Struttura del codice}
+La principale metodologia adottata che ha definito l'architettura della codebase è stato il paradigma MVC (Model-View-Controller).
+\newline
+Ciò ha permesso di separare in maniera ben definita le componenti logiche del gioco (Model), la rappresentazione grafica (View) e la gestione degli input dell'utente (Controller).
+Questo ha facilitato l'estensibilità del progetto in quanto le aree su cui apportare eventuali modifiche erano chiare e distinte e le ripercussioni su altri packages erano ben definite.
+
+\section{Game Loop}
+Per la realizzazione del progetto il primo passo compiuto è stata la creazione del game loop. 
+Grazie ad esso è possibile gestire interazioni in tempo reale, aggiornare lo stato del gioco e renderizzare la grafica in modo fluido.
+
+L'idea di partenza del game loop è quella di mantenere un ciclo continuo ed aggiornare lo stato del gioco ad intervalli regolari.
+Per fare ciò si utilizza un ciclo while che continua finché il gioco è in esecuzione e si definisce un target di aggiornamenti che si vogliono effettuare.
+Nel mio caso ho scelto di effettuare 60 aggiornamenti al secondo, un valore comunemente usato nei videogiochi per garantire fluidità di esecuzione senza sovraccaricare eccessivamente la CPU.
+
+Il codice del game loop è stato implementato nel package Controller, nel seguente modo:
+\newpage
+\begin{lstlisting}[language=Java]
+private static void runGameLoop(Model m, InputController inputController) {
+        long lastTime = System.nanoTime();
+
+        while (gameRunning && !Thread.currentThread().isInterrupted()) {
+            long currentTime = System.nanoTime();
+            long deltaTime = currentTime - lastTime;
+
+            if (deltaTime >= FRAME_TIME_NS) {
+                float dt = deltaTime / 1_000_000_000f;
+                dt = Math.max(FRAME_TIME, Math.min(MAX_FRAME_TIME, dt));
+                m.updateGameState(new HashSet<>(inputController.getInputState()), dt);
+                lastTime = currentTime;
+            } else {
+                long remainingTime = FRAME_TIME_NS - deltaTime;
+                if (remainingTime > 2_000_000) {
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
+                }
+            }
+        }
+    }
+\end{lstlisting}
+
+Il game loop inizia registrando il tempo corrente in nanosecondi. 
+All'interno del ciclo while, calcola il tempo trascorso dall'ultimo aggiornamento (deltaTime). 
+Se questo tempo supera il frame time desiderato (\texttt{FRAME\_TIME\_NS}),
+aggiorna lo stato del gioco chiamando il metodo updateGameState del Model, passando gli input correnti e il delta time normalizzato. 
+Dopo l'aggiornamento, aggiorna lastTime al tempo corrente. Se il deltaTime è inferiore al frame time, 
+il thread dorme per un breve periodo per evitare un utilizzo eccessivo della CPU.
+
+Ad ogni iterazione del ciclo inoltre, viene passato al Model lo stato corrente degli input raccolti dal Controller.
+\newpage
+\section{Gestione degli input}
+Per consentire all'utente di interagire con il videogioco e controllare il personaggio, è stata definita una classe di input catturabili da tastiera.
+Questa classe, chiamata InputController che cattura gli input da tastiera implementando l'interfaccia "KeyListener" e filtrando gli input per i comandi ammissibili dal Model.
+Nel Model è invece definita una classe che mappa una coppia di input (tasti premuti) ad uno specifico comando di gioco, che verrà interpretato nella maniera opportuna
+in base al contesto e allo stato corrente del player.
+Ad esempio il tasto "A" e il tasto "Freccia Sinistra" sono entrambi associati all'azione di movimento a sinistra del personaggio.
+\begin{lstlisting}[language=Java]
+...
+  public enum Action {
+    LEFT(KeyEvent.VK_LEFT, KeyEvent.VK_A),
+    RIGHT(KeyEvent.VK_RIGHT, KeyEvent.VK_D),
+    UP(KeyEvent.VK_UP, KeyEvent.VK_W),
+    DOWN(KeyEvent.VK_DOWN, KeyEvent.VK_S),
+    ESCAPE(KeyEvent.VK_ESCAPE, KeyEvent.VK_Q),
+    SELECT(KeyEvent.VK_E, KeyEvent.VK_E),
+    FIRE(KeyEvent.VK_SPACE, KeyEvent.VK_ENTER),
+    SKIP(KeyEvent.VK_T, KeyEvent.VK_T);
+    ...
+  }
+\end{lstlisting}
+\section{Struttura del Model}
+Il Model ora riceve input normalizzati, ed essendo inserito in un game loop, può aggiornare regolarmente il proprio stato grazie al metodo updateGameState.
+Questo metodo si occupa di aggiornare tutte le entità presenti nel gioco.
+Per poter fare ciò ha bisogno di strutture dati di appoggio che rappresentato lo stato corrente del gioco. 
+Ad alto livello, queste strutture dati sono identificate con:
+\begin{itemize}
+    \item Entity: oggetto base che rappresenta qualsiasi entità presente nel gioco (player, nemici, oggetti, pavimenti ecc.)
+    \item EntityManager: istanza che gestisce tutte le entità
+    \item Collision-Interaction-DamagerManager: istanze che gestiscono le collisioni e le interazioni tra entità
+    \item GameData: oggetto che incapsula le informazioni globali del gioco quali punteggio, tempo trascorso, collezionabili trovati ecc.
+    \item SceneContext: rappresenta la scena corrente del gioco, contenente le entità visibili e interagibili in quel momento.
+\end{itemize}
+Il model inoltre, seguendo il paradigma MVC, estende la classe Observable per notificare la View ad ogni update e mantenerla sincronizzata allo statto attuale.
+
+\section{Posizionamento e movimento delle entità}
+Ogni elemento nel gioco è rappresentato come un'istanza della classe Entity. Questa contiente informazioni riguardanti la posizione e la dimensione. 
+I posizionamenti nel software sono gestiti tramite coordinate cartesiane in un sistema 2D, dove l'origine (0,0) si trova nell'angolo in alto a sinistra dello schermo.
+Le coordinate sono rappresentate dalla classe Point che contiene due valori interi, x (ascissa) e y (ordinata), in pixel.
+
+Le entità a seconda del caso, posso avere anche una velocità (rappresentata in pixel/secondo) e lo spostamento viene calcolato ad ogni aggiornamento del game loop,
+utilizzando la formula:
+\begin{equation}
+    \text{newPosition} = \text{currentPosition} + \text{velocity} \times \Delta t
+\end{equation}
+dove \(\Delta t\) è il tempo trascorso dall'ultimo aggiornamento, fornito dal game loop.
+
+
+
+\section{Risultati}
+Presentare risultati, tabelle e figure.
+\subsection{Esempio di tabella}
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lrr}
+    \toprule
+    Voce & Valore A & Valore B \\
+    \midrule
+    Esempio 1 & 10 & 20 \\
+    Esempio 2 & 15 & 25 \\
+    \bottomrule
+    \end{tabular}
+    \caption{Esempio di tabella.}
+\end{table}
+
+\subsection{Esempio di figura}
+\begin{figure}[h]
+    \centering
+    % \includegraphics[width=0.7\textwidth]{path/to/image}
+    \caption{Esempio di figura.}
+\end{figure}
+
+\section{Discussione}
+Interpretare i risultati, limiti e lavori futuri.
+
+\section{Conclusioni}
+Riepilogo e takeaway principali.
+
+\appendix
+\section{Appendice}
+Dettagli tecnici aggiuntivi.
+
+\end{document}
