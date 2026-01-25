@@ -1,17 +1,26 @@
-% Basic LaTeX boilerplate for a report/article
 \documentclass[11pt,a4paper]{article}
-
 % Language and encoding
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[italian]{babel}
 
+\usepackage{xcolor}
+\usepackage[T1]{fontenc}
+\usepackage[scaled=0.9]{beramono} % Un font monospaziato molto più bello
+
 % Common packages
 \usepackage{lmodern}
+% Font leggibile a schermo
+\usepackage[sfdefault,light,scaled=0.95]{FiraSans} % light weight for body text
+\usepackage{FiraMono}
+% Font matematico armonizzato
+\usepackage{newtxmath}
+\renewcommand{\familydefault}{\sfdefault}
 \usepackage{geometry}
 \usepackage{graphicx}
 \usepackage{amsmath, amssymb}
 \usepackage{hyperref}
+\hypersetup{hidelinks} % rimuove contorni colorati dai link (indice, riferimenti)
 \usepackage{csquotes}
 \usepackage{booktabs}
 \usepackage{microtype}
@@ -19,16 +28,40 @@
 \usepackage{tikz}
 \usepackage{forest}
 \usepackage{listings}
+% Definizione colori "Flat" moderni
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.96} % Grigio chiarissimo, quasi bianco
+\definecolor{deepblue}{rgb}{0,0,0.5}
+\definecolor{deepred}{rgb}{0.6,0,0}
+
 \lstset{
-    language=Java,
-    basicstyle=\ttfamily\small,
-    numbers=left,
-    numberstyle=\tiny,
-    frame=single,
-    breaklines=true,
-    keywordstyle=\color{blue},
-    commentstyle=\color{gray},
-    stringstyle=\color{red}
+  language=Java,
+  backgroundcolor=\color{backcolour},
+  commentstyle=\color{codegray}\itshape, % Commenti in italico
+  keywordstyle=\color{codepurple}\bfseries,
+  numberstyle=\tiny\color{codegray},
+  stringstyle=\color{codegreen},
+  basicstyle=\fontsize{9}{11}\selectfont\ttfamily,
+  breakatwhitespace=false,
+  breaklines=true,
+  captionpos=b,
+  keepspaces=true,
+  numbers=left,
+  numbersep=5pt,
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  tabsize=2,
+  frame=none, % Rimuove la cornice completa vecchia scuola
+  framexleftmargin=5mm, % Margine per la linea laterale
+  xleftmargin=5mm,
+  % Aggiunge una barra laterale colorata moderna invece del box
+  framesep=5pt,
+  rulecolor=\color{codepurple}, % Colore della barra laterale
+  framerule=2pt, % Spessore barra laterale
+  frame=l % Solo linea a sinistra
 }
 
 % Page geometry
@@ -42,8 +75,8 @@
 \begin{document}
 \maketitle
 \begin{figure}[h]
-    \centering
-    \includegraphics[width=0.8\textwidth]{assets/main.jpg}
+  \centering
+  \includegraphics[width=0.8\textwidth]{assets/main.jpg}
 \end{figure}
 \newpage
 \tableofcontents
@@ -51,38 +84,38 @@
 
 \section{Introduzione}
 Il documento descrive il progetto \textbf{JImpossible Mission}, un progetto didattico che consiste nella realizzazione di un videogioco
-in Java basata sul classico gioco per Commodore 64 "Impossible Mission". 
+in Java basata sul classico gioco per Commodore 64 "Impossible Mission".
 \newline
 \newline
-Il videogioco è un platform 2D in cui il giocatore controlla un agente segreto infiltrato in una base nemica. 
+Il videogioco è un platform 2D in cui il giocatore controlla un agente segreto infiltrato in una base nemica.
 Lo scopo del giocatore è quello di cercare e raccogliere, all'interno della base, tutti i frammenti di schede perforate disperse
-e nascoste all'interno degli oggetti discena. Una volta raccolti tutti i frammenti sarà possibile decifrare il codice di accesso alla 
+e nascoste all'interno degli oggetti discena. Una volta raccolti tutti i frammenti sarà possibile decifrare il codice di accesso alla
 stanza di controllo e terminare la missione una volta raggiunta la porta.
 \newline
 \newline
 Il gioco presenta varie meccaniche fondamentali, che definiscono il modo in cui il giocatore interagisce con l'ambiente di gioco e le sfide che deve affrontare.
 Tra queste meccaniche principali troviamo:
 \begin{itemize}
-    \item Controllo del personaggio principale tramite tastiera
-    \item Nemici con IA semplice
-    \item Interazione con oggetti collezionabili e dispositivi (PC, ascensori)
-    \item Gestione delle collisioni tra entità
-    \item Ascensori
-    \item Suoni e animazioni
+  \item Controllo del personaggio principale tramite tastiera
+  \item Nemici con IA semplice
+  \item Interazione con oggetti collezionabili e dispositivi (PC, ascensori)
+  \item Gestione delle collisioni tra entità
+  \item Ascensori
+  \item Suoni e animazioni
 \end{itemize}
 Il gioco è stato sviluppato utilizzando Java, con versione di riferimento JDK 22.
 Per la gestione dei menù, della grafica e delle animazioni è stata utilizzata la libreria Java Swing
 
 I requisiti funzionali del progetto riguardano principalmente:
 \begin{itemize}
-    \item Impiego del pattern strutturale MVC (Model-View-Controller)
-    \item Mondo di gioco dinamico, con entità in movimento, animazioni e suoni
-    \item Ostacoli e nemici da evitare
-    \item Gestione dei profili utente e persistenza dei punteggi
-    \item Oggetti da raccogliere e utilizzare (Freeze, Reset ascensori ecc.)
+  \item Impiego del pattern strutturale MVC (Model-View-Controller)
+  \item Mondo di gioco dinamico, con entità in movimento, animazioni e suoni
+  \item Ostacoli e nemici da evitare
+  \item Gestione dei profili utente e persistenza dei punteggi
+  \item Oggetti da raccogliere e utilizzare (Freeze, Reset ascensori ecc.)
 \end{itemize}
 
-Il gioco è stato sviluppato con l'idea di sfruttare e adottare svariati pattern di progettazione del 
+Il gioco è stato sviluppato con l'idea di sfruttare e adottare svariati pattern di progettazione del
 software per poterne conoscere punti di forza e limiti, oltre che per rendere il codice più lineare e manutenibile.
 Inoltre è stata posta particolare attenzione alla separazione delle responsabilità tra le varie componenti del pattern MVC ed è stata
 promossa la modularità del codice che ha facilitato l'estensione del progetto con funzionalità aggiuntive.
@@ -90,78 +123,75 @@ promossa la modularità del codice che ha facilitato l'estensione del progetto c
 \subsection{Panoramica dell'architettura}
 L'architettura di \textbf{JImpossible Mission} è organizzata come segue:
 \begin{itemize}
-    \item \textbf{Model}: è il cuore del progetto. Gestisce le logiche del gioco, le interazioni tra le entità e rappresenta lo stato del mondo di gioco. \\[2pt]
+  \item \textbf{Model}: è il cuore del progetto. Gestisce le logiche del gioco, le interazioni tra le entità e rappresenta lo stato del mondo di gioco. \\[2pt]
     \textit{Subpackages}: \texttt{entity}, \texttt{manager}, \texttt{physics}, \texttt{game}, \texttt{scene}, \texttt{item}, \texttt{profile}.
-    \item \textbf{View}: si occupa della rappresentazione grafica utilizzando coma base \textbf{Java Swing}, estendendone i componenti. Gestisce le interfacce dei menù, le animazioni e gli effetti audio del gioco \\[2pt]
+  \item \textbf{View}: si occupa della rappresentazione grafica utilizzando coma base \textbf{Java Swing}, estendendone i componenti. Gestisce le interfacce dei menù, le animazioni e gli effetti audio del gioco \\[2pt]
     \textit{Subpackages}: \texttt{animation}, \texttt{audio}, \texttt{color}, \texttt{hud}, \texttt{item}, \texttt{menu}, \texttt{ui}.
-    \item \textbf{Controller}: riceve gli input da tastiera (tramite \texttt{InputController}), li normalizza in comandi di gioco (azioni) e li passa al Model. Contiene inoltre il \textbf{game loop}, che scandisce l'aggiornamento periodico dello stato del gioco.
+  \item \textbf{Controller}: riceve gli input da tastiera (tramite \texttt{InputController}), li normalizza in comandi di gioco (azioni) e li passa al Model. Contiene inoltre il \textbf{game loop}, che scandisce l'aggiornamento periodico dello stato del gioco.
 \end{itemize}
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=1\textwidth]{assets/jimpossible_overview.png}
+\end{figure}
+Come dal diagramma sopra, il flusso di dati principale avviene all'interno del ciclo di gioco (game loop), il Model viene aggiornato regolarmente e la View viene notificata alla fine di ogni ciclo di update per ridisegnare la scena corrente.
 
-\subsection{Principali componenti}
-A livello di package, l'architettura è organizzata in:
-\begin{itemize}
-    \item \textbf{Controller}: gestione del ciclo di gioco, input da tastiera, cambio scena e coordinamento tra Model e View.
-    \item \textbf{Model}: definizione delle entità (player, nemici, oggetti, ascensori), gestione delle collisioni e delle interazioni, logica dei nemici e del punteggio, timer di gioco.
-    \item \textbf{View}: pannelli grafici Swing, rendering delle scene, gestione delle animazioni e dell'HUD.
-    \item \textbf{Audio / Risorse}: caricamento e riproduzione dei suoni, gestione delle sprite e delle immagini.
-    \item \textbf{Persistenza}: gestione dei profili utente e salvataggio dei punteggi su file.
-\end{itemize}
+\section{Il Controller}
+Per iniziare ad approfondire l'architettura del progetto, partiamo dal Controller, che rappresenta il punto di ingresso principale dell'applicazione.
+Il Controller si occupa di gestire il ciclo di vita dell'applicazione, avviando e terminando il gioco in modo appropriato e gestendo le logiche tra le interfacce visualizzate.
+Spetterà poi al Model e alla View di occuparsi rispettivamente dell'implementazione delle logiche e della rappresenzentazione grafica.
 
-\subsection{Flusso di esecuzione}
-Il flusso principale del gioco è il seguente:
-\begin{enumerate}
-    \item Il \textbf{Controller} esegue il \textit{game loop} e, ad ogni iterazione, legge lo stato corrente degli input (\texttt{InputController}).
-    \item Gli input vengono trasformati in \textbf{azioni} di gioco (es. movimento a sinistra, salto, interazione) e passati al \textbf{Model}.
-    \item Il \textbf{Model} aggiorna lo stato del mondo di gioco: posizione delle entità, collisioni, timer, stato dei nemici, gestione degli oggetti collezionabili.
-    \item Il \textbf{Model}, estendendo \texttt{Observable}, notifica le \textbf{View}, che ridisegnano la scena corrente e l'HUD.
-\end{enumerate}
-Il gioco presenta le seguenti funzionalità:
+\subsection{Il Game Loop}
+Una volta inizializzato il Model, e collegato la View del gioco tra i listener del model secondo il pattern \textbf{Observer/Observable}, il Controller avvia il \textbf{game loop}.
+Il \textbf{game loop} è il ciclo principale che gestisce l'aggiornamento del gioco, ad intervalli regolari (anche se con minime fluttuazioni dovute al carico e alla velocità della CPU).
+Per la realizzazione del progetto il primo passo compiuto è stata la definizione di un ciclo di aggiornamento continuo.
+Grazie ad esso è possibile gestire interazioni in tempo reale (tramite \textit{polling} degli input) e aggiornare lo stato del gioco.
+Per fare ciò, nel nostro caso, si utilizza un ciclo \textbf{while} che continua finché il gioco è in esecuzione e si definisce il numero di aggiornamenti desiderati in un certo intervallo di tempo.
+Un buon compromesso tra fluidità e prestazioni, molto comune nel settore dei videogiochi, è impostare un aggiornamento di \textbf{60 volte al secondo}.
 
-\begin{itemize}
-    \item Ciclo di gioco (Game loop)
-    \item Motore fisico (semplice, per il player)
-    \item Controllo del personaggio da tastiera
-    \item Nemici con IA (semplice)
-    \item Ostacoli per il personaggio
-    \item Gestione delle collisioni
-    \item Interazioni con oggetti (collezionabili, uso del PC, porta d'uscita, ascensori)
-    \item Cambi di scena
-    \item Suoni per stato e per frame
-    \item Animazioni
-    \item HUD
-\end{itemize}
+La logica del model viene quindi aggiornata ad ogni iterazione del ciclo, tenendo conto del tempo trascorso dall'ultimo aggiornamento, fondamentale per calcoli di movimenti con velocità e \textbf{collision resolution}.
+Questo intervallo di tempo è definito come \textbf{frame time}, che rappresenta appunto il tempo minimo tra due aggiornamenti consecutivi.
+Il frame time è calcolato come l'inverso del numero di aggiornamenti desiderati al secondo (FPS - Frames Per Second):
+\begin{center}
+  \setlength{\fboxsep}{8pt}
+  \fcolorbox{codepurple}{backcolour}{\(
+      \text{FRAME\_TIME} = \dfrac{1}{\text{FPS}}
+  \)}
+\end{center}
+Invece, il tempo effettivo tra due aggiornamenti consecutivi viene denominato \(\Delta t\) (delta time) e viene calcolato come la differenza tra il tempo corrente e il tempo dell'ultimo aggiornamento.
+Per evitare problemi di calcolo, specie per collision manager e motori fisici, in caso di cali improvvisi di prestazioni, è buona pratica definire un \textbf{max frame time}, che limita il tempo massimo tra due aggiornamenti consecutivi.
+Pertanto, per i calcoli interni al model, il \textit{delta time} viene normalizzato e limitato tra il frame time e il max frame time:
+\begin{center}
+  \setlength{\fboxsep}{8pt}
+  \fcolorbox{codepurple}{backcolour}{\(
+      \Delta t = \max(\text{FRAME\_TIME}, \min(\text{MAX\_FRAME\_TIME}, \Delta t))
+  \)}
+\end{center}
+Il codice del game loop è stato implementato nel nel seguente modo:
 
-\section{Struttura del codice}
-La principale metodologia adottata che ha definito l'architettura della codebase è stato il paradigma MVC (Model-View-Controller).
-\newline
-Ciò ha permesso di separare in maniera ben definita le componenti logiche del gioco (Model), la rappresentazione grafica (View) e la gestione degli input dell'utente (Controller).
-Questo ha facilitato l'estensibilità del progetto in quanto le aree su cui apportare eventuali modifiche erano chiare e distinte e le ripercussioni su altri packages erano ben definite.
-
-\section{Game Loop}
-Per la realizzazione del progetto il primo passo compiuto è stata la creazione del game loop. 
-Grazie ad esso è possibile gestire interazioni in tempo reale, aggiornare lo stato del gioco e renderizzare la grafica in modo fluido.
-
-L'idea di partenza del game loop è quella di mantenere un ciclo continuo ed aggiornare lo stato del gioco ad intervalli regolari.
-Per fare ciò si utilizza un ciclo while che continua finché il gioco è in esecuzione e si definisce un target di aggiornamenti che si vogliono effettuare.
-Nel mio caso ho scelto di effettuare 60 aggiornamenti al secondo, un valore comunemente usato nei videogiochi per garantire fluidità di esecuzione senza sovraccaricare eccessivamente la CPU.
-
-Il codice del game loop è stato implementato nel package Controller, nel seguente modo:
-\newpage
 \begin{lstlisting}[language=Java]
+TARGET_FPS = 60.0f;
+FRAME_TIME = 1.0f / TARGET_FPS; // Timestep base
+MAX_FRAME_TIME = 3.0f / TARGET_FPS; // Massima fluttuazione del timestep
+private static final long FRAME_TIME_NS = (long) (FRAME_TIME * 1_000_000_000);
+
 private static void runGameLoop(Model m, InputController inputController) {
         long lastTime = System.nanoTime();
 
+        // gameRunning e' una variabile boolean condivisa (volatile) che indica se il gioco e' in esecuzione
         while (gameRunning && !Thread.currentThread().isInterrupted()) {
             long currentTime = System.nanoTime();
             long deltaTime = currentTime - lastTime;
 
+            // Controlla se e' passato il tempo sufficiente per definire un frame
             if (deltaTime >= FRAME_TIME_NS) {
                 float dt = deltaTime / 1_000_000_000f;
                 dt = Math.max(FRAME_TIME, Math.min(MAX_FRAME_TIME, dt));
+                // Aggiorna lo stato del gioco, passando il delta time normalizzato e gli input correnti
                 m.updateGameState(new HashSet<>(inputController.getInputState()), dt);
                 lastTime = currentTime;
             } else {
                 long remainingTime = FRAME_TIME_NS - deltaTime;
+                // Se manca ancora 'molto' tempo al prossimo frame, metti il thread in sleep per ridurre l'uso della CPU
                 if (remainingTime > 2_000_000) {
                     try {
                         Thread.sleep(1);
@@ -175,91 +205,276 @@ private static void runGameLoop(Model m, InputController inputController) {
     }
 \end{lstlisting}
 
-Il game loop inizia registrando il tempo corrente in nanosecondi. 
-All'interno del ciclo while, calcola il tempo trascorso dall'ultimo aggiornamento (deltaTime). 
+Il game loop inizia registrando il tempo corrente in nanosecondi.
+All'interno del ciclo while, calcola il tempo trascorso dall'ultimo aggiornamento (deltaTime).
 Se questo tempo supera il frame time desiderato (\texttt{FRAME\_TIME\_NS}),
-aggiorna lo stato del gioco chiamando il metodo updateGameState del Model, passando gli input correnti e il delta time normalizzato. 
-Dopo l'aggiornamento, aggiorna lastTime al tempo corrente. Se il deltaTime è inferiore al frame time, 
-il thread dorme per un breve periodo per evitare un utilizzo eccessivo della CPU.
+aggiorna lo stato del gioco chiamando il metodo updateGameState del Model, passando gli input correnti e il delta time normalizzato.
+Dopo l'aggiornamento, aggiorna lastTime al tempo corrente. Se il deltaTime è inferiore al frame time,
+il thread dorme per un breve periodo per evitare un utilizzo eccessivo della CPU (\textit{busy waiting}).
 
 Ad ogni iterazione del ciclo inoltre, viene passato al Model lo stato corrente degli input raccolti dal Controller.
-\newpage
-\section{Gestione degli input}
-Per consentire all'utente di interagire con il videogioco e controllare il personaggio, è stata definita una classe di input catturabili da tastiera.
-Questa classe, chiamata InputController che cattura gli input da tastiera implementando l'interfaccia "KeyListener" e filtrando gli input per i comandi ammissibili dal Model.
-Nel Model è invece definita una classe che mappa una coppia di input (tasti premuti) ad uno specifico comando di gioco, che verrà interpretato nella maniera opportuna
-in base al contesto e allo stato corrente del player.
-Ad esempio il tasto "A" e il tasto "Freccia Sinistra" sono entrambi associati all'azione di movimento a sinistra del personaggio.
+\subsection{L'InputController}
+Per semplificare il passaggio degli input al Model, è stata definita una classe chiamata \textbf{InputController} che si occupa di catturare gli input da tastiera, implementando l'interfaccia \texttt{KeyListener} di Java Swing.
 \begin{lstlisting}[language=Java]
-...
-  public enum Action {
-    LEFT(KeyEvent.VK_LEFT, KeyEvent.VK_A),
-    RIGHT(KeyEvent.VK_RIGHT, KeyEvent.VK_D),
-    UP(KeyEvent.VK_UP, KeyEvent.VK_W),
-    DOWN(KeyEvent.VK_DOWN, KeyEvent.VK_S),
-    ESCAPE(KeyEvent.VK_ESCAPE, KeyEvent.VK_Q),
-    SELECT(KeyEvent.VK_E, KeyEvent.VK_E),
-    FIRE(KeyEvent.VK_SPACE, KeyEvent.VK_ENTER),
-    SKIP(KeyEvent.VK_T, KeyEvent.VK_T);
-    ...
+  public class InputController implements KeyListener {
+    private final Set<Integer> pressedKeys = ConcurrentHashMap.newKeySet();
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+        // No-op
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        pressedKeys.add(e.getKeyCode());
+    }
+
+    // Rimuove il keyCode dal set al release del tasto.
+    @Override
+    public void keyReleased(KeyEvent e) {
+        pressedKeys.remove(e.getKeyCode());
+    }
+
+    public Set<Action> getInputState() {
+        return pressedKeys.stream().map(Action::fromKeyCode)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+    }
+}
+\end{lstlisting}
+La logica alla base di questa classe è semplice: mantiene un insieme di tasti attualmente premuti (pressedKeys) e aggiorna questo insieme in risposta agli eventi di pressione e rilascio dei tasti.
+Il metodo \texttt{getInputState} restituisce lo stato corrente degli input che verranno successivamente filtrati e mappati in azioni di gioco dal Model.
+\newpage
+\subsection{Gestione delle interfacce}
+Il Controller si occupa anche di connettere le varie interfacce grafiche passando le funzioni che verranno eseguite al verificarsi di determinati \textit{input} dell'utente.
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.7\textwidth]{assets/menu_navigation.png}
+\end{figure}
+Quando vengono eseguiti determinati comandi nella View, il Controller si occuperà di eseguire le azioni corrispondenti, come avviare la partita, salvare le modifiche ai profili utente e interfacciarsi con il model per caricare o salvare i dati.
+
+\section{Analisi e pianificazione del gioco}
+Prima di proseguire con lo sviluppo delle logiche di gioco, bisogna soffermarsi su come sviluppare e riprodurre alcuni punti fondamentali.
+Questo processo inizia con l'individuare le entità principali di gioco, il piano di riferimento del mondo di gioco all'interno del Model e come viene riportato visivamente nella View.
+\subsection{Geometrie e coordinate}
+Per la gestione delle posizioni è stato individuato un sistema di coordinate cartesiane 2D, con l'origine (0,0) nell'angolo in alto a sinistra dello schermo, definito da una coppia di valori interi (x,y).
+Il sistema è stato sviluppato ragionando in \textbf{pixel}, in modo da semplificare i calcoli di posizionamento e movimento delle entità ed uniformare poi il calcolo che verrà effettuato nella View.
+\begin{center}
+  \setlength{\fboxsep}{8pt}
+  \fcolorbox{codepurple}{backcolour}{\parbox{0.9\linewidth}{\small
+      Nonostante si lavori in pixel, il Model non ha una vera e propria "risoluzione". E' però un'astrazione che aiuta a definire le logiche di posizionamento.
+      Le dimensioni delle entità e della finestra possono essere \textit{scalate} a piacimento nel layer di presentazione, preservando \textbf{integralmente} le logiche sottostanti.
+  }}
+\end{center}
+I vari scenari sono stati progettati su una griglia di \textbf{32x32} pixel per cella, individuati come Tile e utilizzati per posizionare pavimenti, muri, oggetti di scena e piattaforme.
+Di conseguenza, la dimensione di ogni stanza è stata definita come multiplo di 32 pixel, andando a definire un'area di gioco di \textbf{40x25} tiles (width x height),
+una dimensione che si adatta bene alla tipologia di gioco ed è simile alla grandezza delle mappe originali. Le entità nel Model, verranno dimensionate in base al rapporto di grandezza rispetto alla dimensione del tile.
+\subsection{Costruzione delle mappe}
+Per agevolare lo sviluppo, il debug dei vari livelli e la creazione di nuove mappe, è stato pensato un semplice formato di file di testo, rappresentante la griglia di tiles e le entità presenti con caratteri ASCII.
+\begin{lstlisting}[language=Java]
+| . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . |
+| . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . |
+| . . . . . . . . . . . . . @ . . . . . . . . . . . . . . . . . . . . . . . . |
+| . . . . . . . . . . . . . . . . . . ~ . . . . . . . . . . . . . . . . . . . |
+| . X . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . |
+| . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . |
+| . . . . . . . . . . . # # # # # # # # # # # # # # . . . . . . . . . . . . . |
+| . . . . . . . . . . . . . . . . . . . . . . . . | . . . . . . . . . . . . . |
+| . . . . . . . . . . . . . . . . . . . . . . . . | . . . . . . . . . . . . . |
+| . # # # # # . . . . . . ~ . . . . . . . . . . . | . . . . . . . . . . . . . |
+| . . . . . . . . . . . . . . . . . . . . . . . . | . . . . . . . . . . . . . |
+| . . . . . . . . . . . . . . . . . . . . . . . . | . . . . . . . . . . . . . |
+| . . . . . . . . # # # # # # # # # # # # # . . . | . . . . . . . . . . . . . |
+| . . . . . . . . . . . . . . . . . . . . . . . . | . . . . . . . . . . . . . |
+| . . . . . . . . . . . . . . . . . . . . . . . . | . . . . . . . . . . . . . |
+| . . . . . . . . . . . . . . . . . . . . . . . . | . . . . . . . . . . . . . |
+> . . . . . . . . . . . . . . . . . . . . . . . . | . . . . . . . . . . . . . >
+> . . . . . . . @ . . . . . . . . @ . . . . . . . | . . . . . . . . . . . . . >
+> . . . . . . . . . . . . C . . . . . . . . . . . | . . . . . C . . . . . . . >
+> . . . . . . . . . . . . . . . . . . . . . . . . | . . . . . . . . . . . . . >
+> . . . . . . . . . . . . . . . . . . . . . . . . | . . . . . . . . . . . . . >
+# # # # # # # # # # # # # # # # # # # # # # ^ . . | ^ . . # # # # # # # # # # #
+| . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . |
+| . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . |
+| . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . |
+\end{lstlisting}
+In questo modo i livelli possono essere creati e modificati facilmente tramite editor di testo, fornendo una rappresentazione semplificata della disposizione delle entità e degli oggetti all'interno del gioco.
+Ogni carattere rappresenta un diverso tipo di tile o entità, ad esempio:
+\begin{itemize}
+  \item \texttt{.} : Spazio vuoto
+  \item \texttt{\#} : Pavimento
+  \item \texttt{X} : Uscita
+  \item \texttt{@} : Nemico
+  \item \texttt{C} : Computer
+  \item \texttt{\textasciitilde} : Collezionabile
+  \item \texttt{\^} : Ascensore
+  \item \texttt{>} : Porte della stanza
+\end{itemize}
+Il parsing di questi file di testo avviene all'avvio del gioco; verranno illustrati in seguito i dettagli tecnici dell'implementazione.
+\subsection{Sistema di collisioni}
+Il gioco, essendo un platform 2D, richiede un sistema di gestione delle collisioni.
+Non avendo meccaniche particolari legate alle animazioni o hitbox dinamiche, si può implementare un sistema basato su \textbf{Axis-Aligned Bounding Box} (AABB), in modo da semplificare calcoli di intersezione e non appesantire la macchina.
+Ogni entità solida (muri, pavimenti, piattaforme, ascensori) avrà una hitbox rettangolare definita dalle sue coordinate e dimensioni.
+Le entità mobili (player, nemici) avranno anch'esse una hitbox AABB, e ad ogni aggiornamento del game loop, il sistema di collisioni verificherà se la hitbox di un'entità mobile interseca quella di un'entità solida.
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.7\textwidth]{assets/AABB_collision.png}
+  \caption{Esempio di collisione AABB (fonte: \href{https://www.amanotes.com/post/using-swept-aabb-to-detect-and-process-collision}{Amanotes}).}
+\end{figure}
+
+\newpage
+\section{Il Model}
+Il Model, sviluppato con pattern \textbf{Singleton}, implementa l'interfaccia \textbf{Observable} per notificare la View ad ogni aggiornamento dello stato di gioco.
+Il punto di ingresso principale del Model è il metodo \texttt{updateGameState}, che viene chiamato ad ogni iterazione del game loop, ricevendo in input i comandi e il tempo trascorso dall'ultimo aggiornamento (\(\Delta t\)).
+
+Il mondo di gioco è rappresentato da una serie di strutture dati è entità che riassumono in maniera logica i vari aspetti del gioco.
+Queste strutture dati sono organizzate in vari package all'interno del Model, ognuno con una responsabilità specifica:
+\subsection{Entity}
+Contiene le classi che rappresentano ogni entità del gioco: dai blocchi statici come muri e pavimenti, alle entità dinamiche come il giocatore.
+Alla base di ogni entità è stata individuata la classe astratta \textbf{Entity}, che definisce le proprietà comuni a tutte le entità:
+\begin{itemize}
+  \item ID univoco
+  \item Posizione
+  \item Funzioni di rimozione dal gioco
+  \item Metodi astratti per eventi come \textit{onRoomLeave}, \textit{onRoomReset} ecc. che verranno implementati dalle sottoclassi
+\end{itemize}
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.65\textwidth,height=0.2\textheight,keepaspectratio]{assets/entity_uml.png}
+\end{figure}
+La classe Entity viene poi estesta per comporre le entità specifiche del gioco, come \texttt{Player} e \texttt{Robot}, implementando interfacce aggiuntive
+utilizzate per categorizzare le entità all'interno dei rispettivi manager: ad esempio, il Player implementa le interfacce \texttt{ActionReceiver}, \texttt{BoundingBox}, \texttt{Interactor} e \texttt{Damageable},
+quindi il sistema saprà che il Player può ricevere azioni, ha una hitbox per le collisioni, può interagire con oggetti e può subire danni.
+
+\subsubsection{\textit{Interfaces}, \textit{Managers} e composizione delle entità}
+Come anticipato, le interfacce utilizzate nel Model sono caratterizzanti della tipologia entità e vengono utilizzate dai vari manager per specifiche funzionalità:
+\begin{itemize}
+  \item \textbf{Damageable}: espone un getter per un BoundingBox che rappresenta l'area in cui l'entità può subire danni
+  \item \textbf{Damager}: espone un getter per un BoundingBox che rappresenta l'area in cui l'entità può infliggere danni
+  \item \textbf{Ephemeral}: interfaccia marker per entità che devono essere rimosse in fase di cleanup (es. proiettili, shockray dei Robot)
+  \item \textbf{Interactable}: espone un getter per un BoundingBox che rappresenta l'area in cui l'entità può essere interagita
+  \item \textbf{Interactor}: espone un getter per un BoundingBox che rappresenta l'area in cui l'entità può interagire con altre entità
+  \item \textbf{Solid}: interfaccia marker per entità solide, come muri, pavimenti e ascensori
+  \item \textbf{Static}: interfaccia marker per entità statiche, che non hanno alcuna funzionalità di movimento (muri, pavimenti ecc.)
+\end{itemize}
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.85\textwidth]{assets/interfaces.png}
+\end{figure}
+La lista di interfacce non è esaustiva, ma rappresenta i principali metodi di categorizzazione delle entità.
+
+I \textbf{Manager} delle entità, in questo software, sono istanze che si occupano di gestire le logiche di collisione in base alle interfacce integrate nelle entità.
+Sono presenti 3 tipi principali di manager:
+\begin{itemize}
+  \item \textbf{CollisionManager}: specializzato nella gestione delle collisioni tra entità solide (Solid) e nel risolvere i movimenti di Player e nemici in movimento, verrà descritto in dettaglio nella sezione relativa alle collisioni.
+  \item \textbf{EntityManager}: contiene e gestisce tutte le entità presenti nel contesto corrente e getters per ottenere liste di entità in base a specifiche interfacce (es. tutti i Damager presenti)
+  \item \textbf{ComponentManager}: classe astratta con interfacce generiche che restituisce metodi per rilevare le collisioni tra entità tra interfacce specifiche (es. Interactor vs Interactable, Damager vs Damageable)
+\end{itemize}
+Si riporta di seguito la classe \textbf{ComponentManager}.
+\begin{lstlisting}[language=Java]
+  /**
+  * Manager generico per componenti di tipo {@code T}.
+  * Fornisce utilita' per recuperare candidati e filtrarli per area e tipo.
+  *
+  * @param <T> tipo degli elementi gestiti
+  */
+  public abstract class ComponentManager<T> {
+    protected final EntityManager entityManager;
+
+    /**
+    * Funzione che mappa un elemento {@code T} ai suoi {@link Bounds} per i test di intersezione.
+    */
+    private final Function<T, Bounds> getCandidateBounds;
+
+    /**
+    * Costruisce un ComponentManager con il relativo EntityManager e la funzione di bounds.
+    *
+    * @param entityManager      gestore delle entita'
+    * @param getCandidateBounds funzione che ritorna i bounds per ciascun candidato
+    */
+    public ComponentManager(EntityManager entityManager,
+    Function<T, Bounds> getCandidateBounds) {
+      this.entityManager = entityManager;
+      this.getCandidateBounds = getCandidateBounds;
+    }
+
+    /**
+    * Restituisce la lista completa dei candidati gestiti.
+    *
+    * @return lista di candidati di tipo {@code T}
+    */
+    public abstract List<T> getCandidates();
+
+    /**
+    * Filtra i candidati i cui bounds intersecano gli {@code actorBounds} forniti.
+    *
+    * @param actorBounds bounds di riferimento per il filtro
+    * @return stream di candidati che intersecano {@code actorBounds}
+    */
+    private Stream<T> getCandidatesInAreaStream(Bounds actorBounds) {
+      return getCandidates().stream().filter(el -> getCandidateBounds.apply(el).intersects(actorBounds));
+    }
+
+    /**
+    * Restituisce i candidati nell'area castati al tipo richiesto.
+    *
+    * @param actorBounds area di ricerca
+    * @param type        classe del tipo desiderato
+    * @param <U>         tipo di ritorno richiesto
+    * @return lista di elementi di tipo {@code U} presenti nell'area
+    */
+    public <U> List<U> getCandidatesInAreaByType(Bounds actorBounds, Class<U> type) {
+      return getCandidatesInAreaStream(actorBounds).filter(type::isInstance).map(type::cast).toList();
+    }
+
+    /**
+    * Restituisce il primo candidato nell'area che e' istanza del tipo richiesto.
+    *
+    * @param actorBounds area di ricerca
+    * @param type        classe del tipo desiderato
+    * @param <U>         tipo opzionale di ritorno
+    * @return Optional contenente il primo elemento di tipo {@code U} se presente
+    */
+    public <U> Optional<U> getFirstCandidatesInAreaByType(Bounds actorBounds, Class<U> type) {
+      return getCandidatesInAreaStream(actorBounds).filter(type::isInstance).map(type::cast).findFirst();
+    }
+
+    /**
+    * Restituisce tutti i candidati che intersecano gli {@code actorBounds}.
+    *
+    * @param actorBounds bounds di riferimento
+    * @return lista di candidati in area
+    */
+    public List<T> getCandidatesInArea(Bounds actorBounds) {
+      return getCandidatesInAreaStream(actorBounds).toList();
+    }
+
+    /**
+    * Restituisce il primo candidato che interseca gli {@code actorBounds}, se presente.
+    *
+    * @param actorBounds bounds di riferimento
+    * @return Optional con il primo candidato nell'area
+    */
+    public Optional<T> getFirstCandidateInArea(Bounds actorBounds) {
+      return getCandidatesInAreaStream(actorBounds).findFirst();
+    }
   }
 \end{lstlisting}
-\section{Struttura del Model}
-Il Model ora riceve input normalizzati, ed essendo inserito in un game loop, può aggiornare regolarmente il proprio stato grazie al metodo updateGameState.
-Questo metodo si occupa di aggiornare tutte le entità presenti nel gioco.
-Per poter fare ciò ha bisogno di strutture dati di appoggio che rappresentato lo stato corrente del gioco. 
-Ad alto livello, queste strutture dati sono identificate con:
-\begin{itemize}
-    \item Entity: oggetto base che rappresenta qualsiasi entità presente nel gioco (player, nemici, oggetti, pavimenti ecc.)
-    \item EntityManager: istanza che gestisce tutte le entità
-    \item Collision-Interaction-DamagerManager: istanze che gestiscono le collisioni e le interazioni tra entità
-    \item GameData: oggetto che incapsula le informazioni globali del gioco quali punteggio, tempo trascorso, collezionabili trovati ecc.
-    \item SceneContext: rappresenta la scena corrente del gioco, contenente le entità visibili e interagibili in quel momento.
-\end{itemize}
-Il model inoltre, seguendo il paradigma MVC, estende la classe Observable per notificare la View ad ogni update e mantenerla sincronizzata allo statto attuale.
+\subsubsection{}
+
+\newpage
 
 \section{Posizionamento e movimento delle entità}
-Ogni elemento nel gioco è rappresentato come un'istanza della classe Entity. Questa contiente informazioni riguardanti la posizione e la dimensione. 
+Ogni elemento nel gioco è rappresentato come un'istanza della classe Entity. Questa contiente informazioni riguardanti la posizione e la dimensione.
 I posizionamenti nel software sono gestiti tramite coordinate cartesiane in un sistema 2D, dove l'origine (0,0) si trova nell'angolo in alto a sinistra dello schermo.
 Le coordinate sono rappresentate dalla classe Point che contiene due valori interi, x (ascissa) e y (ordinata), in pixel.
 
 Le entità a seconda del caso, posso avere anche una velocità (rappresentata in pixel/secondo) e lo spostamento viene calcolato ad ogni aggiornamento del game loop,
 utilizzando la formula:
 \begin{equation}
-    \text{newPosition} = \text{currentPosition} + \text{velocity} \times \Delta t
+  \text{newPosition} = \text{currentPosition} + \text{velocity} \times \Delta t
 \end{equation}
 dove \(\Delta t\) è il tempo trascorso dall'ultimo aggiornamento, fornito dal game loop.
-
-
-
-\section{Risultati}
-Presentare risultati, tabelle e figure.
-\subsection{Esempio di tabella}
-\begin{table}[h]
-    \centering
-    \begin{tabular}{lrr}
-    \toprule
-    Voce & Valore A & Valore B \\
-    \midrule
-    Esempio 1 & 10 & 20 \\
-    Esempio 2 & 15 & 25 \\
-    \bottomrule
-    \end{tabular}
-    \caption{Esempio di tabella.}
-\end{table}
-
-\subsection{Esempio di figura}
-\begin{figure}[h]
-    \centering
-    % \includegraphics[width=0.7\textwidth]{path/to/image}
-    \caption{Esempio di figura.}
-\end{figure}
-
-\section{Discussione}
-Interpretare i risultati, limiti e lavori futuri.
-
-\section{Conclusioni}
-Riepilogo e takeaway principali.
 
 \appendix
 \section{Appendice}
