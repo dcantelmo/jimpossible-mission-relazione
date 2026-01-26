@@ -97,7 +97,7 @@ Il gioco presenta varie meccaniche fondamentali, che definiscono il modo in cui 
 Tra queste meccaniche principali troviamo:
 \begin{itemize}
   \item Controllo del personaggio principale tramite tastiera
-  \item Nemici con IA semplice
+  \item Nemici con IA
   \item Interazione con oggetti collezionabili e dispositivi (PC, ascensori)
   \item Gestione delle collisioni tra entità
   \item Ascensori
@@ -133,15 +133,15 @@ L'architettura di \textbf{JImpossible Mission} è organizzata come segue:
   \centering
   \includegraphics[width=1\textwidth]{assets/jimpossible_overview.png}
 \end{figure}
-Come dal diagramma sopra, il flusso di dati principale avviene all'interno del ciclo di gioco (game loop), il Model viene aggiornato regolarmente e la View viene notificata alla fine di ogni ciclo di update per ridisegnare la scena corrente.
+Come si evince dal diagramma, il flusso di dati principale avviene all'interno del ciclo di gioco (game loop), il Model viene aggiornato regolarmente e la View viene notificata alla fine di ogni ciclo di update per ridisegnare la scena corrente.
 
 \section{Il Controller}
-Per iniziare ad approfondire l'architettura del progetto, partiamo dal Controller, che rappresenta il punto di ingresso principale dell'applicazione.
+Per iniziare ad approfondire l'architettura del progetto, partiamo dal \textbf{Controller}, che rappresenta il punto di ingresso principale dell'applicazione.
 Il Controller si occupa di gestire il ciclo di vita dell'applicazione, avviando e terminando il gioco in modo appropriato e gestendo le logiche tra le interfacce visualizzate.
 Spetterà poi al Model e alla View di occuparsi rispettivamente dell'implementazione delle logiche e della rappresenzentazione grafica.
 
 \subsection{Il Game Loop}
-Una volta inizializzato il Model, e collegato la View del gioco tra i listener del model secondo il pattern \textbf{Observer/Observable}, il Controller avvia il \textbf{game loop}.
+Una volta inizializzato il Model, e aggiunta la View del gioco ai listener del model, secondo il pattern \textbf{Observer/Observable}, il Controller avvia il \textbf{game loop}.
 Il \textbf{game loop} è il ciclo principale che gestisce l'aggiornamento del gioco, ad intervalli regolari (anche se con minime fluttuazioni dovute al carico e alla velocità della CPU).
 Per la realizzazione del progetto il primo passo compiuto è stata la definizione di un ciclo di aggiornamento continuo.
 Grazie ad esso è possibile gestire interazioni in tempo reale (tramite \textit{polling} degli input) e aggiornare lo stato del gioco.
@@ -270,6 +270,7 @@ I vari scenari sono stati progettati su una griglia di \textbf{32x32} pixel per 
 Di conseguenza, la dimensione di ogni stanza è stata definita come multiplo di 32 pixel, andando a definire un'area di gioco di \textbf{40x25} tiles (width x height),
 una dimensione che si adatta bene alla tipologia di gioco ed è simile alla grandezza delle mappe originali. Le entità nel Model, verranno dimensionate in base al rapporto di grandezza rispetto alla dimensione del tile.
 \subsection{Costruzione delle mappe}
+\label{sec:map_building}
 Per agevolare lo sviluppo, il debug dei vari livelli e la creazione di nuove mappe, è stato pensato un semplice formato di file di testo, rappresentante la griglia di tiles e le entità presenti con caratteri ASCII.
 \begin{lstlisting}[language=Java]
 | . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . |
@@ -323,14 +324,28 @@ Le entità mobili (player, nemici) avranno anch'esse una hitbox AABB, e ad ogni 
 \end{figure}
 
 \newpage
-\section{Il Model}
-Il Model, sviluppato con pattern \textbf{Singleton}, implementa l'interfaccia \textbf{Observable} per notificare la View ad ogni aggiornamento dello stato di gioco.
+\section{Panoramica del Model}
+Il Model, sviluppato con pattern \textbf{Singleton}, implementa l'interfaccia \textbf{Observable} per notificare alla View gli aggiornamenti dello stato di gioco.
 Il punto di ingresso principale del Model è il metodo \texttt{updateGameState}, che viene chiamato ad ogni iterazione del game loop, ricevendo in input i comandi e il tempo trascorso dall'ultimo aggiornamento (\(\Delta t\)).
 
-Il mondo di gioco è rappresentato da una serie di strutture dati è entità che riassumono in maniera logica i vari aspetti del gioco.
-Queste strutture dati sono organizzate in vari package all'interno del Model, ognuno con una responsabilità specifica:
-\subsection{Entity}
-Contiene le classi che rappresentano ogni entità del gioco: dai blocchi statici come muri e pavimenti, alle entità dinamiche come il giocatore.
+Il mondo di gioco è rappresentato da una serie di strutture dati e entità che rappresentano in maniera logica i vari aspetti del gioco.
+Queste strutture dati sono organizzate in vari package all'interno del Model, ognuno con una responsabilità specifica.
+\subsection{Unità geometriche e fisiche}
+Per posizionare correttamente le entità nel mondo di gioco, il progetto definisci due geometri fondamenti:
+\begin{itemize}
+  \item \textbf{Point}: rappresenta una posizione nel mondo di gioco, definita da una coppia di coordinate intere (x,y)
+  \item \textbf{Bounds}: rappresenta un'area rettangolare nel mondo di gioco, definita da due punti (Point) che rappresentano l'angolo in alto a sinistra e l'angolo in basso a destra del rettangolo.
+\end{itemize}
+Queste classi forniscono metodi per calcolare intersezioni, verificare se un punto è contenuto all'interno di un'area e altre operazioni geometriche fondamentali.
+Per la gestione dei movimenti invece è stata definita la classe \textbf{Vector2}, su ispirazione del \textit{motore Unity}, che rappresenta un vettore bidimensionale composto da due componenti \textbf{float}.
+La classe implementa inoltre le funzioni matematiche di base per operare con i vettori, come somma, moltiplicazione per uno scalare, normalizzazione, ma espone anche metodi di comodo come cambio di direzione e conversione in Point.
+
+Il gioco inoltre ha richiesto l'utilizzo di un semplice motore fisico per gestire i movimenti di una tipologia di nemico e per simulare la gravità sul giocatore.
+Per questo scopo è stata definita la classe \textbf{Force}, rappresentata da un Vector2 e da un \textbf{ForceType} (enum IMPULSE, CONSTANT).
+L'idea di base è che le forze di tipo IMPULSE vengono applicate una sola volta (es. salto del giocatore) e si consumano, mentre le forze di tipo CONSTANT vengono applicate ad ogni aggiornamento (es. gravità).
+
+\subsection{Entity e pattern di progettazione}
+Il package Entity le classi che rappresentano ogni entità del gioco: dai blocchi statici come muri e pavimenti, alle entità dinamiche come il giocatore.
 Alla base di ogni entità è stata individuata la classe astratta \textbf{Entity}, che definisce le proprietà comuni a tutte le entità:
 \begin{itemize}
   \item ID univoco
@@ -460,9 +475,223 @@ Si riporta di seguito la classe \textbf{ComponentManager}.
     }
   }
 \end{lstlisting}
-\subsubsection{}
+\subsubsection{Player, Enemy e StatePattern}
+Il \textit{Player} e i \textit{Robot} (nemici) sono entità dinamiche che richiedono una gestione ad-hoc per le loro logiche di movimento e di interazione.
+I comportamenti dipendono spesso dallo stato corrente dell'entità, ad esempio se il Player è a terra, può saltare, se è in aria non può effettuare un altro salto e subisce la gravità.
+Per gestire questi stati in modo pulito e modulare, è stato adottato il \textbf{State Pattern}.
+Il Player ha una serie di stati che implementano le logiche specifiche di update e gestione degli input.
+Prendiamo ad esempio la classe astratta \textbf{PlayerState}:
+\begin{lstlisting}[language=Java]
+public abstract class PlayerState implements State {
+    protected static final Bounds NORMAL_BOUNDS = new Bounds(40, 110);
+    protected final Player player;
+    private static long nextId = 0;
+    protected final long ID;
 
-\newpage
+    public PlayerState(Player ctx) {
+        this.player = ctx;
+        ID = nextId++;
+    }
+
+    public void onEnter() {
+    }
+
+    public void onExit() {
+    }
+
+    @Override
+    public long getID() {
+        return ID;
+    }
+
+    public abstract void handleInput(Set<Action> actions, SceneContext sceneContext);
+
+    public abstract void tick(SceneContext context, float deltaTime);
+
+    // Gestisce l'asse orizzontale e restituisce -1 per sinistra +1 per destra
+    protected int handleHorizontalInput(Set<Action> actions) {
+        int x = 0;
+        int s = Player.SPEED;
+
+        if (actions.contains(Action.LEFT))
+            x -= s;
+        if (actions.contains(Action.RIGHT))
+            x += s;
+
+        if (x > 0) {
+            player.facing = Facing.RIGHT;
+        } else if (x < 0) {
+            player.facing = Facing.LEFT;
+        }
+
+        player.physicsState.velocity.x = x;
+        return Integer.signum(x);
+    }
+
+    protected boolean isOnGround(SceneContext context) {
+        return player.isOnGround(context);
+    }
+
+    protected boolean handleDamageCollision(SceneContext context) {
+        Optional<Damager> damager = context.getDamageManager().getFirstCandidateInArea(player.getDamageableBounds());
+        if (damager.isPresent()) {
+            switch (damager.get().getDamageType()) {
+                case DamageType.FALL:
+                    player.changeState(new FallDamagedPlayerState(player));
+                    break;
+                case DamageType.ZAP:
+                default:
+                    player.changeState(new DamagedPlayerState(player));
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    public Bounds getBounds() {
+        return NORMAL_BOUNDS.anchorCenterBottom(Player.ENTITY_BOUNDS.moveCenter(player.getPosition()));
+    }
+}
+\end{lstlisting}
+La classe fornisce metodi di comodo per gestire gli input orizzontali, ma la potenzialità del pattern risiede nei metodi astratti \texttt{handleInput} e \texttt{tick}.
+Questi metodi vengono implementati nelle classi concrete e rappresentano il punto d'ingresso per gestire l'update delegato allo stato corrente dell'entità.
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.7\textwidth]{assets/player_state_uml.png}
+  \caption{Schema UML semplificato dello StatePattern per la classe Player.}
+\end{figure}
+Analogamente, le entity nemiche utilizzano lo stesso principio, ma a differenza del Player,
+il loro stato non viene alterato da input ma viene interamente gestito da una semplice IA definita all'interno degli stati.
+
+\subsubsection{Ascensori e Observable Pattern}
+Gli ascensori sono entità che permettono al Player di spostarsi verticalmente tra i vari piani della stanza.
+Per gestire il loro funzionamento, è stato adottato l'\textbf{Observer Pattern}, con una implementazione personalizzata, per scopi didattici.
+E' stata così definita l'interfaccia \textbf{ObservableEntity} che espone i metodi per aggiungere, rimuovere ed eseguire dei listener, che saranno del tipo \textbf{Consumer<T>}.
+\begin{lstlisting}[language=Java]
+  public abstract class ObservableEntity<T> extends Entity {
+    /**
+     * Collezione thread-safe di listener registrati per ricevere eventi.
+     */
+    private final List<Consumer<T>> listeners = new CopyOnWriteArrayList<>();
+
+    public ObservableEntity() {
+        super();
+    }
+
+    public ObservableEntity(Point position) {
+        super(position);
+    }
+
+    protected int getListenerCount() {
+        return listeners.size();
+    }
+
+    public void addListener(Consumer<T> listener) {
+        listeners.add(listener);
+    }
+
+    public void removeListener(Consumer<T> listener) {
+        listeners.remove(listener);
+    }
+
+    protected void sendEvent(T value) {
+        for (Consumer<T> listener : listeners) {
+            listener.accept(value);
+        }
+    }
+}
+\end{lstlisting}
+Gli ascensori estendono questa classe e definiscono un eventi specifici di \textbf{spostamento} e di \textbf{completamento} tramite la classe \textbf{ElevatorEvent}.
+
+\begin{center}
+  \setlength{\fboxsep}{8pt}
+  \fcolorbox{codepurple}{backcolour}{\parbox{0.9\linewidth}{\small
+      Gli ascensori inoltre contengono una struttura denominata \textbf{StepList<T>}, un estensione di \textit{ArrayList<T>} che usa un \textbf{Comparator} per ordinare i punti in base a dei criteri prestabiliti.
+      L'instanziazione nell'ascensore avviene nel seguente modo:
+      \lstinline[language=Java]!StepList<Point> targets = new StepList<>(Comparator.comparingInt(Point::y))!
+      I punti vengono ordinati in base alla distanza verticale da (y = 0). StepList espone inoltre un'\textbf{iteratore bidirezionale}, il perfetto cursore per muoversi tra i vari piani.
+      \newline
+      {\small\textsf{\textcolor{codepurple}{\textit{Si rimanda alla sezione~\ref{sec:steplist} (\textit{Struttura StepList e StepIterator}) in appendice per i dettagli implementativi.}}}}
+  }}
+\end{center}
+
+Il Player, dopo aver interagito con l'ascensore, entra nello stato \textbf{ElevatorPlayerState} che lo rende immobile e riceve lo spostamento che viene effettuato dall'ascensore tramite un listener registrato.
+Una volta raggiunta la destinazione, l'ascensore invia un evento di completamento al Player che esce dallo stato e riprende il controllo.
+\newline
+{\small\textsf{\textcolor{codepurple}{Si rimanda alla sezione~\ref{sec:elevator_player_state} in appendice per i dettagli implementativi.}}}
+
+\subsubsection{Oggetti di scena e interazioni}
+Nel gioco sono presenti degli oggetti di scena con cui il Player può interagire. Questi oggetti possono contenere degli attivabili che possono essere utilizzati al terminale,
+parti di schede perforate che faranno progredire il Player nella decifratura della password oppure possono anche essere vuoti.
+Gli oggetti di scena sono rappresentati dalla classe \textbf{SceneObject} che implementa l'interfaccia \texttt{Interactable}.
+Essi contengono un riferimento ad un'istanza di \textbf{Collectible} che garantirà il giocatore dell'oggetto corrispondente una volta terminata l'ispezione
+
+\subsection{Room, SceneContext e gestione delle stanze}
+Il mondo di gioco è suddiviso in stanze, all'interno delle quali sono posizionate entità.
+Per implementare questa suddivisione sono state definite una serie di classi:
+\begin{itemize}
+  \item La classe \textbf{Room} rappresenta una singola stanza di gioco. Qui avviene il parsing del file di testo che definisce la mappa, come accennato nel paragrafo ~\ref{sec:map_building}.
+  \item La classe \textbf{SceneContext} fornisce un contesto di esecuzione per la stanza corrente,
+    esponendo riferimenti ai manager delle entità, al CollisionManager e ad altri componenti necessari per l'aggiornamento del gioco.
+  \item La classe \textbf{SceneManager} gestisce la transizione tra le stanze, caricando la stanza successiva quando il Player raggiunge le uscite.
+\end{itemize}
+Il Player può spostarsi tra le stanze mediante l'entità \textbf{Portal}, uno speciale \textbf{Trigger} che implementa l'interfaccia \textit{Interactable}.
+Il Portal, essendo un area di \textit{trigger}, non richiede un'azione esplicita da parte del giocatore per essere attivato, eseguirà automaticamente la funzione assegnata in fase di creazione.
+Contiene inoltre il \textbf{Point} dover il Player verrà posizionato una volta entrato nella nuova stanza.
+
+\subsection{Progresso di gioco}
+Il progresso di gioco viene gestito tramite la classe \textbf{GameData}, contenuta da \textbf{Game} un \texttt{Singleton} che ne fornisce il riferimento.
+\textit{GameData} contiene informazioni sul profilo utente corrente, i collezionabili ottenuti, la password in corso di decifrazione e il tempo di gioco trascorso.
+Una volta terminata la partita, la classe è delegata al calcolo del punteggio in base alle perfomance del giocatore.
+
+\subsection{Punchcard e sistema di password}
+Un elemento chiave del gioco è il sistema di decifrazione della \textbf{password} tramite le schede perforate (\textbf{punchcard}).
+All'avvio di ogni partita, una \textbf{password} viene pescata casualmente da un elenco predefinito e suddivisa in segmenti di 2 caratteri.
+Ogni segmento corrisponde nel gioco a una scheda perforata, implementata come classe \textit{\textbf{Punchcard}},
+suddivisa a sua volta in \textbf{3 frammenti}, rappresentati da \textbf{PunchCardPiece} che implementa \texttt{Collectible}.
+
+Per rappresentare questa meccanica di gioco, è stato deciso di esplorare un approccio basato su bit e calcoli su \textbf{bitmask}.
+Ogni \textbf{punchcard} è rappresentata da \textbf{3 bit}, 1 bit per ogni frammento, dove un bit settato a 1, all'interno di una variabile di tipo \texttt{int} che conterrà i frammenti recuperati, indica che il frammento è stato raccolto.
+Per ogni punchcard recuperata, una parte di \textbf{password} viene svelata al giocatore. Una volta raccolte tutte le punchcard, la password sarà completamente visibile e il giocatore potrà raggiungere la porta di uscita e terminare la partita.
+
+\section{Struttura della View}
+La View è responsabile della rappresentazione grafica del gioco e dell'interfaccia utente.
+Come anticipato, è stat sviluppata utilizzando la librearia JavaSwing, che fornisce componenti GUI e funzionalità di rendering 2D.
+
+Le parti principali della View sono 2:
+\begin{itemize}
+  \item \textbf{Menù iniziale}: Schermata iniziale del gioco, che permette di avviare una nuova partita, caricare un profilo esistente o modificare le impostazioni.
+  \item \textbf{GameView}: Schermata di rendering, responsabile del disegno del gioco.
+\end{itemize}
+Per la realizzazione del menù iniziale è stato utilizzato il CardLayout all'interno del JPanel principale, in modo da poter passare da una schermata all'altra in maniera pulita.
+
+Il pannello di rendering invece estende JPanel, e all'avvio del gioco, il controller rimuove il menù iniziale e aggiunge il pannello di rendering.
+Il rendering vero e proprio avviene sovrascrivendo il metodo \texttt{paintComponent(Graphics g)}, ed è l'unico pannelo che viene istanziato durante il gioco.
+Tutte le entità grafiche implementano l'interfaccia \textbf{Drawable}, che espone il metodo \texttt{draw(Graphics2D g2d, float deltaTime)}.
+
+Ogni volta che il \textbf{Model} notifica un cambiamento di stato, ovvero ad ogni iterazione del game loop (anche se non necessariamente), il metodo \texttt{repaint()}
+viene chiamato sul pannello di rendering ed ogni entità disegnabile viene renderizzata a schermo.
+
+\begin{center}
+  \setlength{\fboxsep}{8pt}
+  \fcolorbox{codepurple}{backcolour}{\parbox{0.9\linewidth}{\small
+      Le entità nel \textbf{Model} contengono un ID univoco, che viene sfruttato dalla View per mantenere una mappa di \textbf{EntityView} associate alle entità,
+      organizzata per \textbf{Layer} che ne determina l'ordine di rendering.
+      In questo modo, ad ogni aggiornamento del gioco, la View può recuperare le istanze grafiche presenti nella scena senza doverle istanziare nuovamente, o rimuovere quelle non più presenti.
+      \newline
+      \lstinline[language=Java]!Map<Layer, Set<EntityView<?>>> views = Collections.synchronizedMap(new EnumMap<>(Layer.class));!
+      \newline
+      La mappa, come si nota dal codice, è una synchronizedMap per garantire la sicurezza in caso di accessi concorrenti, ed eliminare errori che sono stati riscontrati durante lo sviluppo.
+  }}
+\end{center}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.7\textwidth]{assets/view_overview.png}
+  \caption{Schema semplificato rendering.}
+\end{figure}
+
 
 \section{Posizionamento e movimento delle entità}
 Ogni elemento nel gioco è rappresentato come un'istanza della classe Entity. Questa contiente informazioni riguardanti la posizione e la dimensione.
@@ -479,5 +708,195 @@ dove \(\Delta t\) è il tempo trascorso dall'ultimo aggiornamento, fornito dal g
 \appendix
 \section{Appendice}
 Dettagli tecnici aggiuntivi.
+
+\subsection{Struttura StepList e StepIterator}
+\label{sec:steplist}
+La struttura \texttt{StepList<T>} viene utilizzata per gestire una lista ordinata di elementi in base a un \texttt{Comparator} fornito in fase di costruzione e per navigare comodamente tra gli elementi tramite un iteratore bidirezionale specializzato (\texttt{StepIterator}).
+
+La classe mantiene gli elementi sempre ordinati sovrascrivendo il metodo \texttt{add}, che inserisce il nuovo elemento nella posizione corretta secondo il comparatore. L'iteratore interno \texttt{StepIterator} espone operazioni di spostamento avanti/indietro e permette di posizionare il cursore su un elemento esistente.
+
+Di seguito si riporta l'implementazione completa:
+
+\begin{lstlisting}[language=Java]
+/**
+ * Lista che ordina gli elementi secondo un {@link Comparator} fornito.
+ * Fornisce un iteratore bidirezionale ({@link StepIterator}) per la navigazione nella lista.
+ * Utile per logiche di gioco che riguardano il posizionamento degli ascensori.
+ *
+ * @param <T> tipo degli elementi nella lista
+ */
+public class StepList<T> extends ArrayList<T> {
+  private final Comparator<? super T> comparator;
+
+  /**
+   * Costruisce una nuova {@code StepList} usando il comparatore specificato.
+   *
+   * @param comparator comparatore per l'ordinamento degli elementi
+   */
+  public StepList(Comparator<? super T> comparator) {
+    super();
+    this.comparator = comparator;
+  }
+
+  /**
+   * Aggiunge l'elemento nella posizione secondo il comparatore.
+   * Sovrascrive il comportamento di {@link ArrayList#add(Object)}.
+   *
+   * @param element elemento da aggiungere
+   * @return sempre {@code true}
+   */
+  @Override
+  public boolean add(T element) {
+    int index = 0;
+    for (; index < size(); index++) {
+      if (comparator.compare(element, get(index)) < 0) {
+        break;
+      }
+    }
+
+    super.add(index, element);
+    return true;
+  }
+
+  /**
+   * Restituisce un iteratore bidirezionale specializzato ({@link StepIterator})
+   * che mantiene un cursore interno e permette di spostarsi avanti/indietro.
+   *
+   * @return nuovo {@link StepIterator}
+   */
+  @Override
+  public StepIterator iterator() {
+    return new StepIterator();
+  }
+
+  /**
+   * Iteratore interno per {@link StepList} che espone operazioni forward/backward
+   * e la possibilita' di posizionare il cursore su un elemento.
+   */
+  public class StepIterator implements Iterator<T> {
+    private int cursor = 0;
+
+    /**
+     * Indica se esiste un elemento successivo rispetto al cursore.
+     *
+     * @return {@code true} se c'e' un elemento successivo
+     */
+    public boolean hasNext() {
+      return cursor < size();
+    }
+
+    /**
+     * Restituisce l'elemento corrente e avanza il cursore.
+     *
+     * @return elemento successivo
+     * @throws NoSuchElementException se non ci sono elementi successivi
+     */
+    public T next() {
+      if (!hasNext())
+        throw new NoSuchElementException();
+      return get(cursor++);
+    }
+
+    /**
+     * Indica se esiste un elemento precedente rispetto al cursore.
+     *
+     * @return {@code true} se c'e' un elemento precedente
+     */
+    public boolean hasPrevious() {
+      return cursor > 0;
+    }
+
+    /**
+     * Sposta indietro il cursore e restituisce l'elemento precedente.
+     *
+     * @return elemento precedente
+     * @throws NoSuchElementException se non ci sono elementi precedenti
+     */
+    public T previous() {
+      if (!hasPrevious())
+        throw new NoSuchElementException();
+      return get(--cursor);
+    }
+
+    /**
+     * Posiziona il cursore sull'elemento specificato se presente nella lista.
+     *
+     * @param element elemento su cui posizionare il cursore
+     * @return {@code true} se l'elemento e' stato trovato e il cursore aggiornato, {@code false} altrimenti
+     */
+    public boolean setCursorAt(T element) {
+      int index = indexOf(element);
+      if (index < 0)
+        return false;
+      cursor = index;
+      return true;
+    }
+  }
+}
+\end{lstlisting}
+
+\subsection{ElevatorPlayerState}
+\label{sec:elevator_player_state}
+Codice completo della gestione dello stato del Player durante l'utilizzo di un ascensore.
+\begin{lstlisting}[language=Java]
+  public class ElevatorPlayerState extends PlayerState {
+    private final Consumer<ElevatorEvent> elevatorEventConsumer = event -> {
+        switch (event.type()) {
+            case POSITION -> acceptDisplacement(event.point());
+            case FINISH -> player.changeState(new IdlePlayerState(player));
+            default -> {
+            }
+        }
+    };
+
+    private final ObservableEntity<ElevatorEvent> observable;
+    private final Runnable onEnter;
+
+    public ElevatorPlayerState(Player ctx, ObservableEntity<ElevatorEvent> elevator, Runnable onEnter) {
+        super(ctx);
+        this.observable = elevator;
+        this.onEnter = onEnter;
+    }
+
+    /**
+     * Applica lo spostamento fornito dall'evento dell'ascensore.
+     *
+     * @param p delta della posizione
+     */
+    private void acceptDisplacement(Point p) {
+        player.translate(p);
+    }
+
+    /**
+     * All'ingresso si annulla la fisica del player, ci si sottoscrive agli eventi
+     * e si invoca l'azione di salita/discesa fornita dall'ascensore.
+     */
+    @Override
+    public void onEnter() {
+        player.physicsState.clearState();
+        // Si ascoltano gli eventi di movimento/terminazione dell'ascensore
+        observable.addListener(elevatorEventConsumer);
+        onEnter.run();
+    }
+
+    /**
+     * Al termine si ripristina la gravita e si rimuove il listener.
+     */
+    @Override
+    public void onExit() {
+        player.physicsState.forces.add(Player.GRAVITY);
+        observable.removeListener(elevatorEventConsumer);
+    }
+
+    @Override
+    public void handleInput(Set<Action> actions, SceneContext sceneContext) {
+        handleDamageCollision(sceneContext);
+    }
+
+    @Override
+    public void tick(SceneContext context, float deltaTime) {
+    }
+}
+\end{lstlisting}
 
 \end{document}
