@@ -673,6 +673,12 @@ Tutte le entità grafiche implementano l'interfaccia \textbf{Drawable}, che espo
 Ogni volta che il \textbf{Model} notifica un cambiamento di stato, ovvero ad ogni iterazione del game loop (anche se non necessariamente), il metodo \texttt{repaint()}
 viene chiamato sul pannello di rendering ed ogni entità disegnabile viene renderizzata a schermo.
 
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.4\textwidth]{assets/view_overview.png}
+  \caption{Schema semplificato rendering.}
+\end{figure}
+
 \begin{center}
   \setlength{\fboxsep}{8pt}
   \fcolorbox{codepurple}{backcolour}{\parbox{0.9\linewidth}{\small
@@ -686,13 +692,79 @@ viene chiamato sul pannello di rendering ed ogni entità disegnabile viene rende
   }}
 \end{center}
 
+\subsection{Sistema di rendering e Layer}
+I layer nel gioco sono stati implementati tramite un enum \textbf{Layer}, che riassume i principali gruppi di entità grafiche presenti nel gioco.
+\begin{itemize}
+  \item TILE, utilizzato per pavimenti, muri ed elementi statici di sfondo
+  \item INTERACTABLE, su questo layer vengono disegnati oggetti, porte e terminali
+  \item ENEMIES, layer dei nemici
+  \item PLAYER, layer del giocatore
+  \item HUD, utilizzato per disegnare HUD e overlay a schermo
+\end{itemize}
+Ogni entità grafica implementa il metodo \texttt{getLayer()} che restituisce il layer di appartenenza,
+in modo che la View possa organizzare l'ordine di rendering per ciascuna entità presente nella scena.
+
+\subsection{Struttra di una EntityView}
+L'\textbf{EntityView}, come \textbf{Entity} per il Model, è la classe base per tutte le entità grafiche del gioco.
+E' una classe astratta generica che accetta come parametro di tipo l'entità del Model a cui è associata, contenendo il riferimento ad essa.
+
+Le entità, a seconda del ruolo che hanno all'interno del gioco, sono rappresentate e composte in modi differenti.
+Abbiamo entità statiche come muri e pavimenti, che non richiedono animazioni o cambiamenti di stato, o entità dinamiche come il Player e i nemici.
+Per gestire questa varietà, ogni sottoclasse di EntityView includerà o meno istanze di \textbf{AnimationPlayer} o semplici \textbf{BufferedImage}
+per rappresentare l'entità a schermo. Inoltre, alcune entità possono riprodurre suoni e saranno dotate di un'istanza di
+\textbf{AudioAnimationPlayer} (se legati ad animazioni) o di \textbf{AudioPlayer}
+
+\subsection{Gestione degli assets grafici e colori}
+Considerando il gioco originale, dove ogni stanza ha una palette di colori specifica, è stato deciso di prevedere questa funzionalità anche in questa versione.
+Come palette di colori, è stata utilizzata una palette ispirata al \textbf{Commodore 64}, con 16 colori distinti, inseriti nella classe \textbf{C64Color}.
+
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.7\textwidth]{assets/view_overview.png}
-  \caption{Schema semplificato rendering.}
+  \includegraphics[width=0.8\textwidth,draft=false]{assets/commodore64-32x.png}
+  \caption{Palette C64}
 \end{figure}
+Una volta definita la palette, sono state individuate le entità che richiedono una colorazione differente per stanza:
+\begin{itemize}
+  \item Muri e pavimenti
+  \item Ascensori
+  \item Background
+  \item Nemici
+  \item Collezionabili
+\end{itemize}
+Per queste entità, sono stati utilizzati degli \textbf{spritesheet} con colori speciali, dove ogni colore dello sprite viene
+sostiuito in fase di creazione dell'oggetto da un colore appartene alla palette C64.
+I channel utilizzati per la sostituzione sono:
+\begin{itemize}
+  \item Rosso: rgb(255,0,0)
+  \item Magenta: rgb(255,0,255)
+  \item Blu: rgb(0,0,255)
+  \item Ciano: rgb(0,255,255)
+  \item Verde: rgb(0,255,0)
+  \item Giallo: rgb(255,255,0)
+  \item Grigio: rgb(128,128,128) (channel per background)
+\end{itemize}
+\begin{figure}[h]
+  \centering
+  \colorbox{backcolour}{%
+    \begin{minipage}{0.6\textwidth}
+      \includegraphics[width=\textwidth,draft=false]{assets/robot.png}\\[8pt]
+      \rule{0pt}{14pt}% padding bottom
+    \end{minipage}%
+  }
+  \caption{Spritesheet con channel Robot}
+\end{figure}
+La sostituzione del colore viene effettuata utilizzando principalmente l'oggetto \textbf{ColorMapping}, una classe personalizzata che estende \texttt{HashMap<Color, Color>}.
 
+Questa classe, mediante il metodo \lstinline[language=Java]!BufferedImage applyTo(BufferedImage image)! permette di mappare i canali definiti nella sua struttura dati,
+che utilizza come chiave i channel da sostituire e come valore il colore che lo sostituirà.
+Nel gioco sono state definite 4 istanze di ColorMapping, assegnate in maniera casuale alle stanze durante l'esplorazione della base.
 
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.4\textwidth,draft=false]{assets/colore_mapping.png}
+  \caption{Spritesheet con channel Robot}
+\end{figure}
+\newpage
 \section{Posizionamento e movimento delle entità}
 Ogni elemento nel gioco è rappresentato come un'istanza della classe Entity. Questa contiente informazioni riguardanti la posizione e la dimensione.
 I posizionamenti nel software sono gestiti tramite coordinate cartesiane in un sistema 2D, dove l'origine (0,0) si trova nell'angolo in alto a sinistra dello schermo.
