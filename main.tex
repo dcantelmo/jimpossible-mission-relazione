@@ -746,7 +746,7 @@ I channel utilizzati per la sostituzione sono:
 \begin{figure}[h]
   \centering
   \colorbox{backcolour}{%
-    \begin{minipage}{0.6\textwidth}
+    \begin{minipage}{0.5\textwidth}
       \includegraphics[width=\textwidth,draft=false]{assets/robot.png}\\[8pt]
       \rule{0pt}{14pt}% padding bottom
     \end{minipage}%
@@ -757,13 +757,93 @@ La sostituzione del colore viene effettuata utilizzando principalmente l'oggetto
 
 Questa classe, mediante il metodo \lstinline[language=Java]!BufferedImage applyTo(BufferedImage image)! permette di mappare i canali definiti nella sua struttura dati,
 che utilizza come chiave i channel da sostituire e come valore il colore che lo sostituirà.
-Nel gioco sono state definite 4 istanze di ColorMapping, assegnate in maniera casuale alle stanze durante l'esplorazione della base.
+Nel gioco sono state definite \textbf{4 istanze} di ColorMapping con palette di colori predefinite, assegnate in maniera casuale alle stanze durante l'esplorazione della base.
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.4\textwidth,draft=false]{assets/colore_mapping.png}
-  \caption{Spritesheet con channel Robot}
+  \includegraphics[width=0.3\textwidth,draft=false]{assets/colore_mapping.png}
+  \caption{Channel in alto e palette utilizzate in basso.}
 \end{figure}
+
+La flessibilità di questa soluzione ha permesso di estendere questo comportamente anche per la sostituzione delle immagini rappresentanti i collezionabili.
+
+\subsection{HUD e overlay}
+Nel gioco sono presenti alcuni elementi di HUD che forniscono informazioni al giocatore:
+\begin{itemize}
+  \item \textbf{Overlay di ricerca}: mostra una barra di progresso che si svuota man mano che il
+    giocatore avanza nella ricerca di un collezionabile all'interno di un oggetto di scena.
+  \item \textbf{Menù del computer}: menù interattivo che compare quando il giocatore interagisce con un terminale.
+  \item \textbf{Display del progresso di gioco}: display, visibile nelle stanze dell'ascensore, che mostra i progressi effettuati nel gioco e i collezionabili raccolti.
+\end{itemize}
+Questi overlay sono implementati nel Layer HUD e vengono disegnati dopo tutti gli altri elementi di gioco.
+Alla base del rendering di un HUD è presente una cornice, rappresentata da un file immagine quadrato.
+Questo file viene suddiviso in 9 sezioni (4 angoli, 4 lati e centro) e ridimensionato in base alle dimensioni dell'elemento da disegnare, utilizzando la classe \textbf{NineSliceRenderer}.
+La classe permette inoltre di sostiuire il centro con un'immagine di sfondo personalizzata o con un colore pieno.
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=1\textwidth,draft=false]{assets/nine_slice.png}
+  \caption{Decorazione con tecnica Nine-Slice e utilizzo nel gioco.}
+\end{figure}
+\newline
+Per aggiungere testi e altri elementi grafici all'interno degli HUD, è stato deciso di progettare un sistema minimale di layout piuttosto che utilizzare il sistema già presente con Java Swing,
+andando a definire le seguenti classi:
+\begin{itemize}
+  \item \textbf{Panel}: classe contenitore degli elementi da disegnare.
+  \item \textbf{PanelElement}: classe astratta base per tutti i componenti presenti all'interno di un Panel.
+  \item \textbf{TextElement}: classe che estende PanelElement e rappresenta un blocco di testo.
+  \item \textbf{ImageElement}: classe che estende PanelElement e definisce lo sfondo e la decorazione, contenendo un'istanza di NineSliceRenderer.
+  \item \textbf{Padding}: utilizzato per rappresentare spaziature vuote tra gli elementi.
+\end{itemize}
+La classe \textbf{Panel} contiene due differenti layer, dinamico e statico. Il layer statico è composto da elementi che non devono essere ridisegnati nelle varie operazioni di \textit{repaint}, come ad esempio sfondi e cornici.
+Il layer dinamico invece contiene elementi variabili, come ad esempio \textbf{ProgressBar}, una sottoclasse di PanelElement che mostra una barra di progresso, potenzialmente aggiornabile ad ogni render.
+In questo modo, si riduce il carico di lavoro del rendering, eseguendo operazioni solo su componenti che necessitano di aggiornamenti, tramite il metodo \textbf{isDirty()} definito in PanelElement.
+\subsection{Collezionabili}
+I collezionabili vengono mostrati una volta che il giocatore li ha raccolti da un oggetto di scena, all'interno di un overlay dedicato.
+Il collezionabile è definito da un singolo sprite, su un file png che supporta la trasparenza, e utilizzando solo il colore nero per la sostituzione con \textbf{ColorMapping}.
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.4\textwidth,draft=false]{assets/freeze-pass.png}
+  \caption{Esempio di sprite di Freeze Pass.}
+\end{figure}
+\newline
+Un caso particolare è rappresentato dalle \textbf{punchcard}, che contengono 3 frammenti. Lo sprite delle punchcard in questo caso viene suddiviso in 3 parti, verticalmente.
+Ogni frammento viene colorato per essere mostrato sull'overlay e vengono \textbf{sovrapposti} per formare l'immagine completa della punchcard, nel \textit{display di progresso del gioco}.
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.8\textwidth,draft=false]{assets/punchcard_sprites.png}
+  \caption{Sovrapposizione dei frammenti di una punchcard, da sx a dx.}
+\end{figure}
+\subsection{Animazioni}
+Le animazioni nel gioco sono create a partire da una sequenza di immagini, definite in uno \textbf{spritesheet}. Per analizzare il flusso di progettazione, prendiamo come esempio il Player.
+Il Player presenta diverse animazioni, in base allo stato in cui si trova (camminata, salto, danno ecc.).
+\begin{figure}[h]
+  \centering
+  \colorbox{codegray}{%
+    \includegraphics[width=\textwidth,draft=false]{assets/player.png}
+  }
+  \caption{Sprite sheet del Player con animazioni.}
+\end{figure}
+\newline
+Lo spritesheete viene suddiviso in righe, che rappresentano le diverse animationi, e colonne, che rappresentano i frame di ogni animazione.
+Ogni animazione è gestita da una classe denominata \textbf{AnimationData}, una classe immutabile (definita come \texttt{record}) che incapsula i dati principali di un'animazione:
+\begin{itemize}
+  \item Frames di animazione (BufferedImage[])
+  \item Flipped frames, ovvero frame utilizzati per quando il Player e' direzionato nella parte opposta.
+  \item Tipologia di animazione (Enum AnimationMode: LOOP, ONCE)
+  \item Durata di ogni frame (in millisecondi)
+\end{itemize}
+Questi dati vengono poi utilizzati dall'istanza di \textbf{AnimationPlayer} contenuta nella \textbf{PlayerView}.
+\begin{center}
+  \setlength{\fboxsep}{8pt}
+  \fcolorbox{codepurple}{backcolour}{\parbox{0.9\linewidth}{\small
+      Un caso speciale di animazione è rappresentato dall'animazione di \textbf{danno} del Player. Quando il Player subisce un danno, invece di caricare in memoria uno spritesheet,
+      viene salvato l'ultimo frame disegnato e vengono applicati degli effetti sui singoli pixel, facendoli lampeggiare e rendendoli man mano trasparenti,
+      in modo da simulare un effetto di \textbf{Zap} e disintegrazione, fedele al gioco originale.
+      \newline
+      {\small\textsf{\textcolor{codepurple}{Si rimanda alla sezione~\ref{sec:damaged_player_animation} in appendice per i dettagli implementativi.}}}
+  }}
+\end{center}
+
 \newpage
 \section{Posizionamento e movimento delle entità}
 Ogni elemento nel gioco è rappresentato come un'istanza della classe Entity. Questa contiente informazioni riguardanti la posizione e la dimensione.
@@ -970,5 +1050,95 @@ Codice completo della gestione dello stato del Player durante l'utilizzo di un a
     }
 }
 \end{lstlisting}
+
+\subsection{DamagedPlayerState e animazione "electrify"}
+\label{sec:damaged_player}
+In questa sezione si illustra la gestione dello stato di player danneggiato (\texttt{DamagedPlayerState}) e la relativa animazione ``electrify''.
+Quando il player subisce danno, viene attivata un'animazione che alterna variazioni di luminosità, rimozione progressiva di pixel e rotazione dei colori per un effetto lampeggiante. Di seguito sono riportati i segmenti di codice rilevanti:
+
+\paragraph{Factory dell'animazione ``electrify''}
+\begin{lstlisting}[language=Java]
+/**
+ * Factory di animazioni raster derivate da immagini.
+ * Fornisce metodi helper per creare animazioni applicando
+ * effetti visivi alle immagini di input.
+ */
+public class AnimationFactory {
+  /**
+   * Crea un'animazione "electrify" a partire da un'immagine di base.
+   * L'animazione è composta da una sequenza di frame che alternano
+   * variazioni di luminosità, rimozione progressiva di pixel e rotazione
+   * dei colori per un effetto lampeggiante.
+   *
+   * @param img           immagine di partenza (non viene modificata)
+   * @param totalDuration durata totale dell'animazione in secondi
+   * @return {@link AnimationData} contenente i frame e la durata di ciascun frame
+   */
+  public static AnimationData createElectrifyAnimation(BufferedImage img, float totalDuration) {
+    int totalFrames = 80;
+    float frameDuration = totalDuration / totalFrames;
+
+    BufferedImage[] frames = new BufferedImage[totalFrames];
+
+    for (int i = 0; i < totalFrames; i++) {
+      BufferedImage frame = copyImage(img);
+
+      // Alterna colori scuri e chiari
+      if (i % 2 == 0) {
+        frame = ImageEffects.darken(frame, 0.6);
+      } else {
+        frame = ImageEffects.lighten(frame, 0.6);
+      }
+
+      if (i >= 40) {
+        // rimuovi pixel progressivamente
+        int pixelsToRemove = (i - 40 + 1) * 120;
+        frame = ImageEffects.removePixels(frame, pixelsToRemove);
+      }
+
+      // inverti ogni 2 frame
+      if ((i / 2) % 2 == 1) {
+        frame = ImageEffects.rotateColors(frame);
+      }
+
+      frames[i] = frame;
+    }
+
+    return new AnimationData(frames, frames, AnimationMode.ONCE, frameDuration);
+  }
+
+  /**
+   * Crea e restituisce una copia profonda dell'immagine fornita.
+   * Utilizzato per non modificare l'immagine originale durante la
+   * generazione dei frame.
+   *
+   * @param img immagine da copiare
+   * @return nuova istanza di {@link BufferedImage} con gli stessi dati
+   */
+  private static BufferedImage copyImage(BufferedImage img) {
+    BufferedImage copy = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
+    copy.setData(img.getData());
+    return copy;
+  }
+}
+\end{lstlisting}
+
+\paragraph{Attivazione dell'animazione in draw}
+\begin{lstlisting}[language=Java]
+public void draw(Graphics2D g, float deltaTime) {
+  PlayerState playerState = entity.getState();
+
+  if (playerState instanceof DamagedPlayerState) {
+    if (!animationDataMap.containsKey(DamagedPlayerState.class)) {
+      // Basta aggiungere l'animazione all'HashMap, la lambda passata all'AnimationPlayer la recupererà
+      animationDataMap.put(DamagedPlayerState.class, AnimationFactory.createElectrifyAnimation(lastFrame,
+          DamagedPlayerState.DURATION));
+    }
+  } else
+    animationDataMap.remove(DamagedPlayerState.class);
+  // ...
+}
+\end{lstlisting}
+In questo modo, quando il player entra nello stato danneggiato, viene creata e attivata l'animazione ``electrify''.
 
 \end{document}
