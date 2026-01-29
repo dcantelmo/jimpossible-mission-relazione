@@ -122,7 +122,7 @@ L'architettura di \textbf{JImpossible Mission} è organizzata come segue:
 \begin{itemize}
   \item \textbf{Model}: è il cuore del progetto. Gestisce le logiche del gioco, le interazioni tra le entità e rappresenta lo stato del mondo di gioco. \\[2pt]
     \textit{Subpackages}: \texttt{entity}, \texttt{manager}, \texttt{physics}, \texttt{game}, \texttt{scene}, \texttt{item}, \texttt{profile}.
-  \item \textbf{View}: si occupa della rappresentazione grafica utilizzando coma base \textbf{Java Swing}, estendendone i componenti. Gestisce le interfacce dei menù, le animazioni e gli effetti audio del gioco \\[2pt]
+  \item \textbf{View}: si occupa della rappresentazione grafica utilizzando come base \textbf{Java Swing}, estendendone i componenti. Gestisce le interfacce dei menù, le animazioni e gli effetti audio del gioco \\[2pt]
     \textit{Subpackages}: \texttt{animation}, \texttt{audio}, \texttt{color}, \texttt{hud}, \texttt{item}, \texttt{menu}, \texttt{ui}.
   \item \textbf{Controller}: riceve gli input da tastiera (tramite \texttt{InputController}), li normalizza in comandi di gioco (azioni) e li passa al Model. Contiene inoltre il \textbf{game loop}, che scandisce l'aggiornamento periodico dello stato del gioco.
 \end{itemize}
@@ -273,7 +273,7 @@ una dimensione che si adatta bene alla tipologia di gioco ed è simile alla gran
 Una volta definite le unità di misura e la griglia di riferimento, il movimento delle entità viene calcolato tenendo conto della loro velocità e del tempo trascorso tra un aggiornamento e l'altro del game loop.
 In termini continui, la posizione viene aggiornata usando la classica formula:
 \[
-  ext{nuovaPosizione} = \text{posizioneCorrente} + \text{velocità} \cdot \Delta t
+  \text{nuovaPosizione} = \text{posizioneCorrente} + \text{velocità} \cdot \Delta t
 \]
 dove la velocità è espressa in \emph{pixel al secondo} e \(\Delta t\) è il tempo trascorso tra due frame consecutivi (in secondi), calcolato e normalizzato come descritto nella sezione~\ref{sec:game_loop}.
 
@@ -662,10 +662,8 @@ Questa suddivisione viene gestita da un piccolo ``sistema di scene'' basato su q
   \item La classe \textbf{SceneManager} mantiene il riferimento alla scena corrente e coordina il passaggio da una scena all'altra,
     delegando a \texttt{SceneContext} l'esecuzione delle operazioni di ingresso/uscita e il posizionamento del player.
 \end{itemize}
-\newline
 \small{\textsf{\textcolor{codepurple}{Per i dettagli implementativi di Map, Room e SceneContext si rimanda alla sezione~\ref{sec:scene_system_appendix} in appendice.}}}
 \newline
-
 Il Player può spostarsi tra le stanze mediante l'entità \textbf{Portal}, uno speciale \textbf{Trigger} che implementa l'interfaccia \texttt{Interactable}.
 Il \textit{Portal}, essendo un'area di trigger, non richiede un'azione esplicita da parte del giocatore per essere attivato: quando il Player entra nei suoi \texttt{Bounds},
 la scena corrente richiede al \texttt{SceneManager} la transizione verso il \texttt{SceneContext} collegato.
@@ -690,6 +688,15 @@ Dal punto di vista del player, il ciclo di cambio stanza si può riassumere come
 Nel caso speciale dell'ascensore principale, i vari piani dell'ascensore sono rappresentati da una serie di scene collegate in verticale nella \texttt{Map}.
 Il \texttt{SceneContext} dell'ascensore mantiene una mappa tra posizioni del piano (coordinate logiche sull'albero dei piani) e scene di destinazione;
 quando il player entra nello stato di utilizzo dell'ascensore, questa struttura viene utilizzata per determinare a quale stanza collegare ciascun piano.
+
+\subsection{Update del gioco}
+Ad ogni iterazione del game loop, il Model deve far 'progredire' lo stato del gioco in base al contesto, agli input ricevuti e al tempo trascorso.
+Per poter consentire l'aggiornamento di tutte le entità in modo ordinato e coerente, è stato definito un flusso di aggiornamento che percorre i principali attori 'attivi' durante il game loop, dall'invocazione del metodo \texttt{updateGameState} fino alla notifica alla View.
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth,draft=false]{assets/model_update_scheme.png}
+  \caption{Flusso di aggiornamento del Model.}
+\end{figure}
 
 \subsection{Progresso di gioco}
 Il progresso di gioco viene gestito tramite la classe \textbf{GameData}, contenuta da \textbf{Game} un \texttt{Singleton} che ne fornisce il riferimento.
@@ -984,7 +991,7 @@ e viene avviato il game loop descritto nella sezione~\ref{sec:game_loop} relativ
 \subsection{Camminata, salto e motore fisico}
 Il movimento del giocatore e tramite un semplice motore fisico, come definito nella sezione~\ref{sec:movement_overview} e nella sezione~\ref{sec:game_geometry}, basato sulle classi \textbf{PhysicsState}, \textbf{Force} e \textbf{Vector2}.
 Ogni entità dinamica mantiene un vettore velocità e, nel caso del Player, una lista di forze attive, come gravità e impulso del salto.
-La classe \textbf{PhysicsState} si occupa di sommare le forze costantie di aggiornare la velocità tenendo conto del \(\Delta t\) calcolato nel game loop,
+La classe \textbf{PhysicsState} si occupa di sommare le forze costanti di aggiornare la velocità tenendo conto del \(\Delta t\) calcolato nel game loop,
 mentre gli stati del Player (\textbf{PlayerState}) decidono quali forze applicare
 in risposta ai tasti premuti (camminata a sinistra/destra, avvio di un salto) e quando azzerare o modificare lo stato fisico (ad esempio all'ingresso in un ascensore).
 \begin{figure}[h]
@@ -1203,11 +1210,27 @@ la selezione dell'avatar e passata all'interno del gioco tramite il profilo.
 \newpage
 \section{Conclusioni}
 Il progetto ha rappresentato una sfida interessante, che ha messo in luce i principali problemi legati allo sviluppo del software, e le soluzioni che possono essere applicate caso per caso.
-L'adozione del pattern MVC ha contribuito a mantenere una separazione netta tra logica di gioco e interfaccia utente, contribuendo a mantenere il progetto organizzato, nonostante la moltitudine di classi gestite.
-Pattern come State hanno facilitato ampiamente la gestione di comportamenti complessi, separando e isolando logiche che altrimenti sarebbero state inserite in lunghe porzioni di codice poco manutenibile e difficilmente estendibile.
-L'Observer pattern ha permesso di creare un flusso di dati reattivo tra Model e View, rinforzando ulteriormente la separazione tra i package e favorendo il decoupling.
-Infine, è risultato essenziale applicare i principi della programmazione orientata agli oggetti, come astrazione e composizione, sfruttando quindi interfacce, 
-ereditarietà e classi astratte per creare entità flessibili e riutilizzabili.
+
+La realizzazione di un videogioco, anche in scala didattica, evidenzia
+come aspetti apparentemente indipendenti (input, aggiornamento temporale, fisica, collisioni, rendering e gestione delle risorse)
+debbano invece essere progettati in modo coerente, per mantenere comportamento deterministico e controlli responsivi.
+
+A tale scopo, l'adozione del pattern MVC ha avuto un ruolo centrale nel mantenere la separazione tra logica di gioco e interfacce, contribuendo a mantenere il progetto organizzato nonostante la moltitudine di classi gestite.
+
+Inoltre, pattern come \textbf{State}, hanno facilitato di molto la gestione di comportamenti complessi, separando e
+isolando logiche che altrimenti sarebbero state inserite come lunghe porzioni di codice poco manutenibile e
+difficilmente estendibile.
+
+Durante lo sviluppo di gioco, è stato fondamentale individuare quali parti del software potevano impattare maggiormente sulle performance del gioco.
+In particolare, è stata prestata attenzione alla gestione delle collisioni, con ottimizzazione come baking di collider statici e filtraggio con broad phase,
+che hanno permesso di ottenere un'esperienza di gioco fluida anche in presenza di una moltitudine di entità in scena.
+
+Applicare i principi della programmazione orientata ad oggetti, per questa tipologia di progetto, ha facilitato la creazione e la
+modellazione di entità di gioco complosse, avvalendosi di concetti come astrazione e composizione. Le varie meccaniche di gioco sono
+state scomposte e analizzate singolarmente, per poi essere implementate come componenti, sottoclassi o interfacce. Questo processo di sviluppo
+ha permesso di creare un software che all'apparenza sembrava molto difficile da realizzare, ma che grazie a un'attenta progettazione
+si è rivelato gestibile e divertente da sviluppare.
+
 \newpage
 \appendix
 \section{Appendice}
