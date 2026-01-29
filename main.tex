@@ -5,7 +5,6 @@
 \usepackage[italian]{babel}
 
 \usepackage{xcolor}
-\usepackage[T1]{fontenc}
 \usepackage[scaled=0.9]{beramono} % Un font monospaziato molto più bello
 
 % Common packages
@@ -24,7 +23,6 @@
 \usepackage{csquotes}
 \usepackage{booktabs}
 \usepackage{microtype}
-\usepackage{xcolor}
 \usepackage{tikz}
 \usepackage{forest}
 \usepackage{listings}
@@ -84,15 +82,13 @@
 
 \section{Introduzione}
 Il documento descrive il progetto \textbf{JImpossible Mission}, un progetto didattico che consiste nella realizzazione di un videogioco
-in Java basata sul classico gioco per Commodore 64 "Impossible Mission".
-\newline
-\newline
+in Java basato sul classico gioco per Commodore~64 "Impossible Mission".
+
 Il videogioco è un platform 2D in cui il giocatore controlla un agente segreto infiltrato in una base nemica.
 Lo scopo del giocatore è quello di cercare e raccogliere, all'interno della base, tutti i frammenti di schede perforate disperse
-e nascoste all'interno degli oggetti discena. Una volta raccolti tutti i frammenti sarà possibile decifrare il codice di accesso alla
+e nascoste all'interno degli oggetti di scena. Una volta raccolti tutti i frammenti sarà possibile decifrare il codice di accesso alla
 stanza di controllo e terminare la missione una volta raggiunta la porta.
-\newline
-\newline
+
 Il gioco presenta varie meccaniche fondamentali, che definiscono il modo in cui il giocatore interagisce con l'ambiente di gioco e le sfide che deve affrontare.
 Tra queste meccaniche principali troviamo:
 \begin{itemize}
@@ -104,7 +100,7 @@ Tra queste meccaniche principali troviamo:
   \item Suoni e animazioni
 \end{itemize}
 Il gioco è stato sviluppato utilizzando Java, con versione di riferimento JDK 22.
-Per la gestione dei menù, della grafica e delle animazioni è stata utilizzata la libreria Java Swing
+Per la gestione dei menù, della grafica e delle animazioni è stata utilizzata la libreria Java Swing.
 
 I requisiti funzionali del progetto riguardano principalmente:
 \begin{itemize}
@@ -115,10 +111,11 @@ I requisiti funzionali del progetto riguardano principalmente:
   \item Oggetti da raccogliere e utilizzare (Freeze, Reset ascensori ecc.)
 \end{itemize}
 
-Il gioco è stato sviluppato con l'idea di sfruttare e adottare svariati pattern di progettazione del
-software per poterne conoscere punti di forza e limiti, oltre che per rendere il codice più lineare e manutenibile.
+Il gioco è stato sviluppato con l'idea di sfruttare e adottare diversi pattern di progettazione del
+software, per conoscerne punti di forza e limiti.
+Questo approccio ha anche reso il codice più lineare e manutenibile.
 Inoltre è stata posta particolare attenzione alla separazione delle responsabilità tra le varie componenti del pattern MVC ed è stata
-promossa la modularità del codice che ha facilitato l'estensione del progetto con funzionalità aggiuntive.
+promossa la modularità del codice, che ha facilitato l'estensione del progetto con funzionalità aggiuntive.
 
 \subsection{Panoramica dell'architettura}
 L'architettura di \textbf{JImpossible Mission} è organizzata come segue:
@@ -138,14 +135,15 @@ Come si evince dal diagramma, il flusso di dati principale avviene all'interno d
 \section{Il Controller}
 Per iniziare ad approfondire l'architettura del progetto, partiamo dal \textbf{Controller}, che rappresenta il punto di ingresso principale dell'applicazione.
 Il Controller si occupa di gestire il ciclo di vita dell'applicazione, avviando e terminando il gioco in modo appropriato e gestendo le logiche tra le interfacce visualizzate.
-Spetterà poi al Model e alla View di occuparsi rispettivamente dell'implementazione delle logiche e della rappresenzentazione grafica.
+Spetterà poi al Model e alla View di occuparsi rispettivamente dell'implementazione delle logiche e della rappresentazione grafica.
 
 \subsection{Il Game Loop}
+\label{sec:game_loop}
 Una volta inizializzato il Model, e aggiunta la View del gioco ai listener del model, secondo il pattern \textbf{Observer/Observable}, il Controller avvia il \textbf{game loop}.
 Il \textbf{game loop} è il ciclo principale che gestisce l'aggiornamento del gioco, ad intervalli regolari (anche se con minime fluttuazioni dovute al carico e alla velocità della CPU).
 Per la realizzazione del progetto il primo passo compiuto è stata la definizione di un ciclo di aggiornamento continuo.
 Grazie ad esso è possibile gestire interazioni in tempo reale (tramite \textit{polling} degli input) e aggiornare lo stato del gioco.
-Per fare ciò, nel nostro caso, si utilizza un ciclo \textbf{while} che continua finché il gioco è in esecuzione e si definisce il numero di aggiornamenti desiderati in un certo intervallo di tempo.
+Nel nostro caso si utilizza un ciclo \textbf{while} che continua finché il gioco è in esecuzione e si definisce il numero di aggiornamenti desiderati in un certo intervallo di tempo.
 Un buon compromesso tra fluidità e prestazioni, molto comune nel settore dei videogiochi, è impostare un aggiornamento di \textbf{60 volte al secondo}.
 
 La logica del model viene quindi aggiornata ad ogni iterazione del ciclo, tenendo conto del tempo trascorso dall'ultimo aggiornamento, fondamentale per calcoli di movimenti con velocità e \textbf{collision resolution}.
@@ -166,7 +164,7 @@ Pertanto, per i calcoli interni al model, il \textit{delta time} viene normalizz
       \Delta t = \max(\text{FRAME\_TIME}, \min(\text{MAX\_FRAME\_TIME}, \Delta t))
   \)}
 \end{center}
-Il codice del game loop è stato implementato nel nel seguente modo:
+Il codice del game loop è stato implementato nel seguente modo:
 
 \begin{lstlisting}[language=Java]
 TARGET_FPS = 60.0f;
@@ -206,13 +204,12 @@ private static void runGameLoop(Model m, InputController inputController) {
 \end{lstlisting}
 
 Il game loop inizia registrando il tempo corrente in nanosecondi.
-All'interno del ciclo while, calcola il tempo trascorso dall'ultimo aggiornamento (deltaTime).
-Se questo tempo supera il frame time desiderato (\texttt{FRAME\_TIME\_NS}),
-aggiorna lo stato del gioco chiamando il metodo updateGameState del Model, passando gli input correnti e il delta time normalizzato.
-Dopo l'aggiornamento, aggiorna lastTime al tempo corrente. Se il deltaTime è inferiore al frame time,
+All'interno del ciclo while calcola il tempo trascorso dall'ultimo aggiornamento (deltaTime) e, se questo tempo supera il frame time desiderato (\texttt{FRAME\_TIME\_NS}),
+aggiorna lo stato del gioco chiamando il metodo \texttt{updateGameState} del Model, passando gli input correnti e il delta time normalizzato.
+Dopo l'aggiornamento imposta \texttt{lastTime} al tempo corrente; se invece il \textit{deltaTime} è inferiore al frame time,
 il thread dorme per un breve periodo per evitare un utilizzo eccessivo della CPU (\textit{busy waiting}).
 
-Ad ogni iterazione del ciclo inoltre, viene passato al Model lo stato corrente degli input raccolti dal Controller.
+Ad ogni iterazione del ciclo viene inoltre passato al Model lo stato corrente degli input raccolti dal Controller.
 \subsection{L'InputController}
 Per semplificare il passaggio degli input al Model, è stata definita una classe chiamata \textbf{InputController} che si occupa di catturare gli input da tastiera, implementando l'interfaccia \texttt{KeyListener} di Java Swing.
 \begin{lstlisting}[language=Java]
@@ -244,6 +241,7 @@ Per semplificare il passaggio degli input al Model, è stata definita una classe
 \end{lstlisting}
 La logica alla base di questa classe è semplice: mantiene un insieme di tasti attualmente premuti (pressedKeys) e aggiorna questo insieme in risposta agli eventi di pressione e rilascio dei tasti.
 Il metodo \texttt{getInputState} restituisce lo stato corrente degli input che verranno successivamente filtrati e mappati in azioni di gioco dal Model.
+In questo modo il Model lavora esclusivamente con azioni astratte (\texttt{Action}) e rimane disaccoppiato dai dettagli specifici dei codici di tastiera e di Java Swing.
 \newpage
 \subsection{Gestione delle interfacce}
 Il Controller si occupa anche di connettere le varie interfacce grafiche passando le funzioni che verranno eseguite al verificarsi di determinati \textit{input} dell'utente.
@@ -269,6 +267,24 @@ Il sistema è stato sviluppato ragionando in \textbf{pixel}, in modo da semplifi
 I vari scenari sono stati progettati su una griglia di \textbf{32x32} pixel per cella, individuati come Tile e utilizzati per posizionare pavimenti, muri, oggetti di scena e piattaforme.
 Di conseguenza, la dimensione di ogni stanza è stata definita come multiplo di 32 pixel, andando a definire un'area di gioco di \textbf{40x25} tiles (width x height),
 una dimensione che si adatta bene alla tipologia di gioco ed è simile alla grandezza delle mappe originali. Le entità nel Model, verranno dimensionate in base al rapporto di grandezza rispetto alla dimensione del tile.
+
+\subsection{Movimento e formula della velocità}
+\label{sec:movement_overview}
+Una volta definite le unità di misura e la griglia di riferimento, il movimento delle entità viene calcolato tenendo conto della loro velocità e del tempo trascorso tra un aggiornamento e l'altro del game loop.
+In termini continui, la posizione viene aggiornata usando la classica formula:
+\[
+  ext{nuovaPosizione} = \text{posizioneCorrente} + \text{velocità} \cdot \Delta t
+\]
+dove la velocità è espressa in \emph{pixel al secondo} e \(\Delta t\) è il tempo trascorso tra due frame consecutivi (in secondi), calcolato e normalizzato come descritto nella sezione~\ref{sec:game_loop}.
+
+Nel codice questo concetto è rappresentato tramite il vettore bidimensionale \textbf{Vector2}, che memorizza la velocità orizzontale e verticale (\(v_x, v_y\)). Ad ogni aggiornamento, in base ai tasti premuti o alle forze applicate,
+gli stati del Player e dei nemici aggiornano la velocità desiderata e richiedono uno spostamento espresso in pixel:
+\[
+  \Delta x = v_x \cdot \Delta t, \quad \Delta y = v_y \cdot \Delta t
+\]
+Questo spostamento viene poi passato al sistema di collisioni, che lo "corregge" per evitare la penetrazione nei blocchi solidi.
+In questo modo il gioco resta fluido anche in presenza di piccole variazioni nel frame time, preservando coerenza e responsività dei controlli.
+
 \subsection{Costruzione delle mappe}
 \label{sec:map_building}
 Per agevolare lo sviluppo, il debug dei vari livelli e la creazione di nuove mappe, è stato pensato un semplice formato di file di testo, rappresentante la griglia di tiles e le entità presenti con caratteri ASCII.
@@ -313,6 +329,7 @@ Ogni carattere rappresenta un diverso tipo di tile o entità, ad esempio:
 \end{itemize}
 Il parsing di questi file di testo avviene all'avvio del gioco; verranno illustrati in seguito i dettagli tecnici dell'implementazione.
 \subsection{Sistema di collisioni}
+\label{sec:collision_system_overview}
 Il gioco, essendo un platform 2D, richiede un sistema di gestione delle collisioni.
 Non avendo meccaniche particolari legate alle animazioni o hitbox dinamiche, si può implementare un sistema basato su \textbf{Axis-Aligned Bounding Box} (AABB), in modo da semplificare calcoli di intersezione e non appesantire la macchina.
 Ogni entità solida (muri, pavimenti, piattaforme, ascensori) avrà una hitbox rettangolare definita dalle sue coordinate e dimensioni.
@@ -331,7 +348,8 @@ Il punto di ingresso principale del Model è il metodo \texttt{updateGameState},
 Il mondo di gioco è rappresentato da una serie di strutture dati e entità che rappresentano in maniera logica i vari aspetti del gioco.
 Queste strutture dati sono organizzate in vari package all'interno del Model, ognuno con una responsabilità specifica.
 \subsection{Unità geometriche e fisiche}
-Per posizionare correttamente le entità nel mondo di gioco, il progetto definisci due geometri fondamenti:
+\label{sec:game_geometry}
+Per posizionare correttamente le entità nel mondo di gioco, il progetto definisce due geometrie fondamentali:
 \begin{itemize}
   \item \textbf{Point}: rappresenta una posizione nel mondo di gioco, definita da una coppia di coordinate intere (x,y)
   \item \textbf{Bounds}: rappresenta un'area rettangolare nel mondo di gioco, definita da due punti (Point) che rappresentano l'angolo in alto a sinistra e l'angolo in basso a destra del rettangolo.
@@ -357,7 +375,7 @@ Alla base di ogni entità è stata individuata la classe astratta \textbf{Entity
   \centering
   \includegraphics[width=0.65\textwidth,height=0.2\textheight,keepaspectratio]{assets/entity_uml.png}
 \end{figure}
-La classe Entity viene poi estesta per comporre le entità specifiche del gioco, come \texttt{Player} e \texttt{Robot}, implementando interfacce aggiuntive
+La classe Entity viene poi estesa per comporre le entità specifiche del gioco, come \texttt{Player} e \texttt{Robot}, implementando interfacce aggiuntive
 utilizzate per categorizzare le entità all'interno dei rispettivi manager: ad esempio, il Player implementa le interfacce \texttt{ActionReceiver}, \texttt{BoundingBox}, \texttt{Interactor} e \texttt{Damageable},
 quindi il sistema saprà che il Player può ricevere azioni, ha una hitbox per le collisioni, può interagire con oggetti e può subire danni.
 
@@ -383,7 +401,7 @@ Sono presenti 3 tipi principali di manager:
 \begin{itemize}
   \item \textbf{CollisionManager}: specializzato nella gestione delle collisioni tra entità solide (Solid) e nel risolvere i movimenti di Player e nemici in movimento, verrà descritto in dettaglio nella sezione relativa alle collisioni.
   \item \textbf{EntityManager}: contiene e gestisce tutte le entità presenti nel contesto corrente e getters per ottenere liste di entità in base a specifiche interfacce (es. tutti i Damager presenti)
-  \item \textbf{ComponentManager}: classe astratta con interfacce generiche che restituisce metodi per rilevare le collisioni tra entità tra interfacce specifiche (es. Interactor vs Interactable, Damager vs Damageable)
+  \item \textbf{ComponentManager}: classe astratta di supporto per tutti i manager basati su componenti; incapsula la logica di recupero e filtraggio dei candidati in un'area, permettendo di rilevare interazioni tra entità che espongono determinate interfacce (es. Interactor vs Interactable, Damager vs Damageable)
 \end{itemize}
 Si riporta di seguito la classe \textbf{ComponentManager}.
 \begin{lstlisting}[language=Java]
@@ -478,7 +496,7 @@ Si riporta di seguito la classe \textbf{ComponentManager}.
 \subsubsection{Player, Enemy e StatePattern}
 Il \textit{Player} e i \textit{Robot} (nemici) sono entità dinamiche che richiedono una gestione ad-hoc per le loro logiche di movimento e di interazione.
 I comportamenti dipendono spesso dallo stato corrente dell'entità, ad esempio se il Player è a terra, può saltare, se è in aria non può effettuare un altro salto e subisce la gravità.
-Per gestire questi stati in modo pulito e modulare, è stato adottato il \textbf{State Pattern}.
+Per gestire questi stati in modo pulito e modulare, è stato adottato lo \textbf{State Pattern}.
 Il Player ha una serie di stati che implementano le logiche specifiche di update e gestione degli input.
 Prendiamo ad esempio la classe astratta \textbf{PlayerState}:
 \begin{lstlisting}[language=Java]
@@ -556,14 +574,16 @@ public abstract class PlayerState implements State {
 \end{lstlisting}
 La classe fornisce metodi di comodo per gestire gli input orizzontali, ma la potenzialità del pattern risiede nei metodi astratti \texttt{handleInput} e \texttt{tick}.
 Questi metodi vengono implementati nelle classi concrete e rappresentano il punto d'ingresso per gestire l'update delegato allo stato corrente dell'entità.
+Senza questo pattern, tutte le logiche di movimento e di reazione sarebbero concentrate in un unico metodo con lunghi blocchi di \texttt{if} o \texttt{switch} sullo stato, rendendo il codice poco estendibile.
+Con gli stati, aggiungere un nuovo comportamento equivale ad aggiungere una nuova classe che implementa \texttt{PlayerState}.
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.7\textwidth]{assets/player_state_uml.png}
+  \includegraphics[width=0.5\textwidth]{assets/player_state_uml.png}
   \caption{Schema UML semplificato dello StatePattern per la classe Player.}
 \end{figure}
 Analogamente, le entity nemiche utilizzano lo stesso principio, ma a differenza del Player,
 il loro stato non viene alterato da input ma viene interamente gestito da una semplice IA definita all'interno degli stati.
-
+\newpage
 \subsubsection{Ascensori e Observable Pattern}
 Gli ascensori sono entità che permettono al Player di spostarsi verticalmente tra i vari piani della stanza.
 Per gestire il loro funzionamento, è stato adottato l'\textbf{Observer Pattern}, con una implementazione personalizzata, per scopi didattici.
@@ -625,25 +645,56 @@ Una volta raggiunta la destinazione, l'ascensore invia un evento di completament
 Nel gioco sono presenti degli oggetti di scena con cui il Player può interagire. Questi oggetti possono contenere degli attivabili che possono essere utilizzati al terminale,
 parti di schede perforate che faranno progredire il Player nella decifratura della password oppure possono anche essere vuoti.
 Gli oggetti di scena sono rappresentati dalla classe \textbf{SceneObject} che implementa l'interfaccia \texttt{Interactable}.
-Essi contengono un riferimento ad un'istanza di \textbf{Collectible} che garantirà il giocatore dell'oggetto corrispondente una volta terminata l'ispezione
+Essi contengono un riferimento ad un'istanza di \textbf{Collectible} che garantirà al giocatore l'oggetto corrispondente una volta terminata l'ispezione.
 
 \subsection{Room, SceneContext e gestione delle stanze}
-Il mondo di gioco è suddiviso in stanze, all'interno delle quali sono posizionate entità.
-Per implementare questa suddivisione sono state definite una serie di classi:
+Il mondo di gioco è suddiviso in stanze, all'interno delle quali sono posizionate le varie entità (player, nemici, oggetti di scena, ascensori, portal ecc.).
+Questa suddivisione viene gestita da un piccolo ``sistema di scene'' basato su quattro classi principali:
 \begin{itemize}
-  \item La classe \textbf{Room} rappresenta una singola stanza di gioco. Qui avviene il parsing del file di testo che definisce la mappa, come accennato nel paragrafo ~\ref{sec:map_building}.
-  \item La classe \textbf{SceneContext} fornisce un contesto di esecuzione per la stanza corrente,
-    esponendo riferimenti ai manager delle entità, al CollisionManager e ad altri componenti necessari per l'aggiornamento del gioco.
-  \item La classe \textbf{SceneManager} gestisce la transizione tra le stanze, caricando la stanza successiva quando il Player raggiunge le uscite.
+  \item La classe \textbf{Map} rappresenta la mappa logica dell'intera base: è una griglia di tipi di stanza (\texttt{RoomType}) caricata da file testuale.
+    Ogni cella della griglia indica se in quella posizione è presente una stanza di sinistra/destra, una stanza con uscita, oppure un blocco dell'ascensore principale.
+  \item La classe \textbf{Room} rappresenta una singola stanza. Qui avviene il parsing del file di testo che definisce il layout della stanza,
+    come accennato nel paragrafo~\ref{sec:map_building}: il file ASCII viene letto riga per riga e convertito in una matrice di \texttt{TileType},
+    dalla quale vengono istanziate le entità (muri, pavimenti, robot, oggetti di scena ecc.).
+  \item La classe \textbf{SceneContext} fornisce un contesto di esecuzione per una singola scena (stanza o sezione dell'ascensore principale),
+    incapsulando i manager delle entità (\texttt{EntityManager}, \texttt{CollisionManager}, \texttt{InteractionManager}, \texttt{DamageManager})
+    e gestendo in modo sicuro spawn, rimozioni e transizioni tra scene.
+  \item La classe \textbf{SceneManager} mantiene il riferimento alla scena corrente e coordina il passaggio da una scena all'altra,
+    delegando a \texttt{SceneContext} l'esecuzione delle operazioni di ingresso/uscita e il posizionamento del player.
 \end{itemize}
-Il Player può spostarsi tra le stanze mediante l'entità \textbf{Portal}, uno speciale \textbf{Trigger} che implementa l'interfaccia \textit{Interactable}.
-Il Portal, essendo un area di \textit{trigger}, non richiede un'azione esplicita da parte del giocatore per essere attivato, eseguirà automaticamente la funzione assegnata in fase di creazione.
-Contiene inoltre il \textbf{Point} dover il Player verrà posizionato una volta entrato nella nuova stanza.
+\newline
+\small{\textsf{\textcolor{codepurple}{Per i dettagli implementativi di Map, Room e SceneContext si rimanda alla sezione~\ref{sec:scene_system_appendix} in appendice.}}}
+\newline
+
+Il Player può spostarsi tra le stanze mediante l'entità \textbf{Portal}, uno speciale \textbf{Trigger} che implementa l'interfaccia \texttt{Interactable}.
+Il \textit{Portal}, essendo un'area di trigger, non richiede un'azione esplicita da parte del giocatore per essere attivato: quando il Player entra nei suoi \texttt{Bounds},
+la scena corrente richiede al \texttt{SceneManager} la transizione verso il \texttt{SceneContext} collegato.
+Ogni portal contiene inoltre il \textbf{Point} dove il Player verrà posizionato una volta entrato nella nuova scena, in modo da farlo apparire nel punto corretto della stanza di destinazione.
+
+Quando viene avviata una nuova partita, il \textbf{Model} inizializza il player e costruisce uno \textbf{SceneManager} associato ad esso.
+Lo \texttt{SceneManager}, a sua volta, carica la \texttt{Map} da file testuale
+(ad esempio \textbf{resources/room\_types/map.txt}),
+genera tutti i \texttt{SceneContext} necessari e imposta il contesto iniziale tramite il metodo \texttt{setCurrentContext}.
+Ad ogni iterazione del game loop, il metodo \texttt{updateGameState(actions, deltaTime)} del Model recupera il \texttt{SceneContext} corrente,
+applica le eventuali modifiche differite (spawn e rimozioni) attraverso \texttt{updateContext()} e aggiorna le entità contenute.
+
+Dal punto di vista del player, il ciclo di cambio stanza si può riassumere come segue:
+\begin{enumerate}
+  \item il Player entra nei bounds di un \textbf{Portal} nella stanza corrente;
+  \item il \texttt{SceneContext} corrente registra la scena di destinazione e programmerà la transizione al prossimo \texttt{updateContext()};
+  \item al frame successivo, \texttt{SceneManager.setCurrentContext} invoca \texttt{onExit} sulla scena di provenienza (notifica alle entità, rimozione del player, rilascio dei collider)
+    e \texttt{onEnter} sulla scena di destinazione, calcolando lo spawn del player a partire dai portal collegati;
+  \item il player viene aggiunto al nuovo \texttt{EntityManager} e, da quel momento, gli aggiornamenti del Model avvengono nella nuova scena.
+\end{enumerate}
+
+Nel caso speciale dell'ascensore principale, i vari piani dell'ascensore sono rappresentati da una serie di scene collegate in verticale nella \texttt{Map}.
+Il \texttt{SceneContext} dell'ascensore mantiene una mappa tra posizioni del piano (coordinate logiche sull'albero dei piani) e scene di destinazione;
+quando il player entra nello stato di utilizzo dell'ascensore, questa struttura viene utilizzata per determinare a quale stanza collegare ciascun piano.
 
 \subsection{Progresso di gioco}
 Il progresso di gioco viene gestito tramite la classe \textbf{GameData}, contenuta da \textbf{Game} un \texttt{Singleton} che ne fornisce il riferimento.
 \textit{GameData} contiene informazioni sul profilo utente corrente, i collezionabili ottenuti, la password in corso di decifrazione e il tempo di gioco trascorso.
-Una volta terminata la partita, la classe è delegata al calcolo del punteggio in base alle perfomance del giocatore.
+Una volta terminata la partita, la classe è delegata al calcolo del punteggio in base alle performance del giocatore.
 
 \subsection{Punchcard e sistema di password}
 Un elemento chiave del gioco è il sistema di decifrazione della \textbf{password} tramite le schede perforate (\textbf{punchcard}).
@@ -653,11 +704,12 @@ suddivisa a sua volta in \textbf{3 frammenti}, rappresentati da \textbf{PunchCar
 
 Per rappresentare questa meccanica di gioco, è stato deciso di esplorare un approccio basato su bit e calcoli su \textbf{bitmask}.
 Ogni \textbf{punchcard} è rappresentata da \textbf{3 bit}, 1 bit per ogni frammento, dove un bit settato a 1, all'interno di una variabile di tipo \texttt{int} che conterrà i frammenti recuperati, indica che il frammento è stato raccolto.
+Ad esempio, con 3 frammenti si utilizzano i bit da 0 a 2 di un intero: se il giocatore ha raccolto il primo e il terzo frammento lo stato sarà \texttt{0b101} (5 in decimale).
 Per ogni punchcard recuperata, una parte di \textbf{password} viene svelata al giocatore. Una volta raccolte tutte le punchcard, la password sarà completamente visibile e il giocatore potrà raggiungere la porta di uscita e terminare la partita.
 
 \section{Struttura della View}
 La View è responsabile della rappresentazione grafica del gioco e dell'interfaccia utente.
-Come anticipato, è stat sviluppata utilizzando la librearia JavaSwing, che fornisce componenti GUI e funzionalità di rendering 2D.
+Come anticipato, è stata sviluppata utilizzando la libreria Java Swing, che fornisce componenti GUI e funzionalità di rendering 2D.
 
 Le parti principali della View sono 2:
 \begin{itemize}
@@ -666,8 +718,8 @@ Le parti principali della View sono 2:
 \end{itemize}
 Per la realizzazione del menù iniziale è stato utilizzato il CardLayout all'interno del JPanel principale, in modo da poter passare da una schermata all'altra in maniera pulita.
 
-Il pannello di rendering invece estende JPanel, e all'avvio del gioco, il controller rimuove il menù iniziale e aggiunge il pannello di rendering.
-Il rendering vero e proprio avviene sovrascrivendo il metodo \texttt{paintComponent(Graphics g)}, ed è l'unico pannelo che viene istanziato durante il gioco.
+Il pannello di rendering invece estende JPanel e, all'avvio del gioco, il Controller rimuove il menù iniziale e aggiunge il pannello di rendering.
+Il rendering vero e proprio avviene sovrascrivendo il metodo \texttt{paintComponent(Graphics g)}, ed è l'unico pannello che viene istanziato durante il gioco.
 Tutte le entità grafiche implementano l'interfaccia \textbf{Drawable}, che espone il metodo \texttt{draw(Graphics2D g2d, float deltaTime)}.
 
 Ogni volta che il \textbf{Model} notifica un cambiamento di stato, ovvero ad ogni iterazione del game loop (anche se non necessariamente), il metodo \texttt{repaint()}
@@ -704,7 +756,7 @@ I layer nel gioco sono stati implementati tramite un enum \textbf{Layer}, che ri
 Ogni entità grafica implementa il metodo \texttt{getLayer()} che restituisce il layer di appartenenza,
 in modo che la View possa organizzare l'ordine di rendering per ciascuna entità presente nella scena.
 
-\subsection{Struttra di una EntityView}
+\subsection{Struttura di una EntityView}
 L'\textbf{EntityView}, come \textbf{Entity} per il Model, è la classe base per tutte le entità grafiche del gioco.
 E' una classe astratta generica che accetta come parametro di tipo l'entità del Model a cui è associata, contenendo il riferimento ad essa.
 
@@ -732,7 +784,7 @@ Una volta definita la palette, sono state individuate le entità che richiedono 
   \item Collezionabili
 \end{itemize}
 Per queste entità, sono stati utilizzati degli \textbf{spritesheet} con colori speciali, dove ogni colore dello sprite viene
-sostiuito in fase di creazione dell'oggetto da un colore appartene alla palette C64.
+sostituito in fase di creazione dell'oggetto da un colore appartenente alla palette C64.
 I channel utilizzati per la sostituzione sono:
 \begin{itemize}
   \item Rosso: rgb(255,0,0)
@@ -765,7 +817,7 @@ Nel gioco sono state definite \textbf{4 istanze} di ColorMapping con palette di 
   \caption{Channel in alto e palette utilizzate in basso.}
 \end{figure}
 
-La flessibilità di questa soluzione ha permesso di estendere questo comportamente anche per la sostituzione delle immagini rappresentanti i collezionabili.
+La flessibilità di questa soluzione ha permesso di estendere questo comportamento anche alla sostituzione delle immagini rappresentanti i collezionabili.
 
 \subsection{HUD e overlay}
 Nel gioco sono presenti alcuni elementi di HUD che forniscono informazioni al giocatore:
@@ -813,7 +865,9 @@ Ogni frammento viene colorato per essere mostrato sull'overlay e vengono \textbf
   \includegraphics[width=0.8\textwidth,draft=false]{assets/punchcard_sprites.png}
   \caption{Sovrapposizione dei frammenti di una punchcard, da sx a dx.}
 \end{figure}
+\newpage
 \subsection{Animazioni}
+\label{sec:animations}
 Le animazioni nel gioco sono create a partire da una sequenza di immagini, definite in uno \textbf{spritesheet}. Per analizzare il flusso di progettazione, prendiamo come esempio il Player.
 Il Player presenta diverse animazioni, in base allo stato in cui si trova (camminata, salto, danno ecc.).
 \begin{figure}[h]
@@ -824,15 +878,19 @@ Il Player presenta diverse animazioni, in base allo stato in cui si trova (cammi
   \caption{Sprite sheet del Player con animazioni.}
 \end{figure}
 \newline
-Lo spritesheete viene suddiviso in righe, che rappresentano le diverse animationi, e colonne, che rappresentano i frame di ogni animazione.
+Lo spritesheet viene suddiviso in righe, che rappresentano le diverse animazioni, e colonne, che rappresentano i frame di ogni animazione.
 Ogni animazione è gestita da una classe denominata \textbf{AnimationData}, una classe immutabile (definita come \texttt{record}) che incapsula i dati principali di un'animazione:
 \begin{itemize}
   \item Frames di animazione (BufferedImage[])
-  \item Flipped frames, ovvero frame utilizzati per quando il Player e' direzionato nella parte opposta.
-  \item Tipologia di animazione (Enum AnimationMode: LOOP, ONCE)
-  \item Durata di ogni frame (in millisecondi)
+  \item Frame ribaltati orizzontalmente (flipped frames), utilizzati quando il Player è rivolto nella direzione opposta.
+  \item Tipologia di animazione (enum \textbf{AnimationMode}: \texttt{LOOP}, \texttt{ONCE})
+  \item Durata di ogni frame (in secondi)
 \end{itemize}
 Questi dati vengono poi utilizzati dall'istanza di \textbf{AnimationPlayer} contenuta nella \textbf{PlayerView}.
+La classe \textbf{Animation} si occupa di tenere traccia del tempo trascorso e di calcolare, in base alla durata dei frame e alla modalità (\texttt{LOOP}/\texttt{ONCE}),
+l'indice del frame corrente, restituendo l'immagine da disegnare (flipped o meno).
+\textbf{AnimationPlayer<S>} collega questo meccanismo al pattern di stato: dato uno stato \texttt{S}, seleziona i relativi \textbf{AnimationData}, aggiorna l'animazione con il \(\Delta t\)
+e notifica eventuali \textbf{AnimationListener} quando cambia il frame o lo stato dell'animazione (come avviene per \textbf{AudioAnimationPlayer} descritto nella sezione dedicata al sistema audio).
 \begin{center}
   \setlength{\fboxsep}{8pt}
   \fcolorbox{codepurple}{backcolour}{\parbox{0.9\linewidth}{\small
@@ -840,26 +898,649 @@ Questi dati vengono poi utilizzati dall'istanza di \textbf{AnimationPlayer} cont
       viene salvato l'ultimo frame disegnato e vengono applicati degli effetti sui singoli pixel, facendoli lampeggiare e rendendoli man mano trasparenti,
       in modo da simulare un effetto di \textbf{Zap} e disintegrazione, fedele al gioco originale.
       \newline
-      {\small\textsf{\textcolor{codepurple}{Si rimanda alla sezione~\ref{sec:damaged_player_animation} in appendice per i dettagli implementativi.}}}
+      {\small\textsf{\textcolor{codepurple}{Si rimanda alla sezione~\ref{sec:damaged_player} in appendice per i dettagli implementativi.}}}
   }}
 \end{center}
 
+\subsection{Sistema audio}
+Il sistema audio del gioco ha l'obiettivo di gestire effetti sonori one-shot (come salti o `zap'),
+suoni in loop (rumore di fondo dei robot, musica ambientale) e suoni sincronizzati con le animazioni.
+Tutta la logica audio risiede nel package \texttt{view.audio} ed è costruita attorno a pochi componenti principali:
+\begin{itemize}
+  \item \textbf{ClipLoader}: utility che carica file audio dal classpath e restituisce un'istanza di \texttt{Clip} pronta alla riproduzione.
+  \item \textbf{SfxData}: struttura che incapsula uno o più pool di clip, le informazioni su loop/shuffle/interruzione e fornisce il metodo \texttt{nextAvailableClip()} per recuperare una clip da riprodurre senza saturare le risorse.
+  \item \textbf{AudioPlayer}: player generico che, dato un \texttt{SfxData}, riproduce effetti one-shot e loop applicando un volume globale tramite il controllo \texttt{MASTER\_GAIN} quando disponibile.
+  \item \textbf{AudioAnimationPlayer}: estende \texttt{AudioPlayer} e implementa \texttt{AnimationListener}, permettendo di agganciare suoni a stati di animazione, a frame specifici e a transizioni tra stati.
+  \item \textbf{AmbientAudioPlayer}: estende \texttt{AudioPlayer} e si occupa di avviare o fermare suoni ambientali in base alla presenza di certe classi di entità nel mondo di gioco.
+  \item \textbf{AudioManager}: componente semplificato che consente la riproduzione veloce di file audio a partire dal percorso sul filesystem.
+\end{itemize}
+La classe \textbf{SfxData} rappresenta l'unità di configurazione di un effetto sonoro: partendo da uno o più file audio,
+crea dei pool di clip riutilizzabili per evitare di riallocare risorse ad ogni riproduzione e per permettere multiple riproduzioni contemporanee dello stesso suono.
+In alcuni casi il pool è ristretto e condiviso, per evitare la sovrapposizione di suoni,
+come nel caso del pool audio riservato ai Robot, dato che possono essere presenti multiple istanze in una sola area.
+contemporanee dello stesso suono.
+I flag \textbf{loop}, \textbf{shuffle} e \textbf{interruptible} definiscono rispettivamente
+se il suono può essere messo in loop continuo, se la scelta tra i file disponibili avviene in modo casuale (come ad esempio per gli effetti di passi) e se un effetto in corso può essere interrotto
+per iniziarne uno nuovo. Il metodo \texttt{nextAvailableClip()} cerca una clip libera nel pool e, se tutte le clip sono occupate,
+può eventualmente interrompere quella più vecchia se l'effetto è marcato come interrompibile.
+
+\begin{center}
+  \setlength{\fboxsep}{8pt}
+  \fcolorbox{codepurple}{backcolour}{\parbox{0.9\linewidth}{\small
+      La classe \textbf{AudioAnimationPlayer<S>} integra il sistema audio con il sistema di animazioni: per ogni stato \texttt{S}
+      è possibile registrare un suono in loop (ad esempio il ronzio di un robot mentre pattuglia), uno o più suoni sincronizzati a frame specifici (come passi o atterraggi)
+      e suoni associati alle transizioni tra stati (es. ingresso nello stato di danno).
+      L'implementazione si basa sulle callback \texttt{onFrameChanged} e \texttt{onStateChanged} dell'interfaccia \texttt{AnimationListener}.
+      \newline
+      {\small\textsf{\textcolor{codepurple}{Si rimanda alla sezione~\ref{sec:audio_system_appendix} in appendice per i dettagli implementativi del sistema audio (\texttt{SfxData}, \texttt{AudioPlayer} e \texttt{AudioAnimationPlayer}).}}}
+  }}
+\end{center}
+
+La classe \textbf{AmbientAudioPlayer} collega invece l'audio al contenuto della scena corrente.
+Riceve in ingresso la collezione di entità presenti (tramite il Model/View) e, per ogni classe registrata (ad esempio \texttt{Robot} o \texttt{ElectricBall}),
+verifica se è presente almeno un'istanza. In caso affermativo, avvia il loop del suono associato; quando tutte le entità di quella classe scompaiono,
+il loop viene fermato. In questo modo suoni ambientali come il rumore dei nemici si adattano alla situazione del gioco.
 \newpage
-\section{Posizionamento e movimento delle entità}
-Ogni elemento nel gioco è rappresentato come un'istanza della classe Entity. Questa contiente informazioni riguardanti la posizione e la dimensione.
-I posizionamenti nel software sono gestiti tramite coordinate cartesiane in un sistema 2D, dove l'origine (0,0) si trova nell'angolo in alto a sinistra dello schermo.
-Le coordinate sono rappresentate dalla classe Point che contiene due valori interi, x (ascissa) e y (ordinata), in pixel.
+\section{Il Gioco}
+In questa sezione verrà percorso il ``journey`` del giocatore, dall'avvio del menù principale fino al completamento della partita,
+illustrando le principali funzionalità implementate e le soluzioni tecniche adottate per realizzarle.
 
-Le entità a seconda del caso, posso avere anche una velocità (rappresentata in pixel/secondo) e lo spostamento viene calcolato ad ogni aggiornamento del game loop,
-utilizzando la formula:
-\begin{equation}
-  \text{newPosition} = \text{currentPosition} + \text{velocity} \times \Delta t
-\end{equation}
-dove \(\Delta t\) è il tempo trascorso dall'ultimo aggiornamento, fornito dal game loop.
+\subsection{Menù principale}
+Il menù principale rappresenta il punto di ingresso dell'esperienza di gioco: tramite la schermata iniziale il giocatore può selezionare un profilo esistente,
+crearne uno nuovo o modificare quello corrente, prima di avviare effettivamente la partita. La logica di coordinamento tra le varie schermate del menù
+è affidata a \textbf{MenuController}, che utilizza un contenitore principale (\textbf{MainMenu}) per mostrare alternativamente la lista dei profili e l'editor.
+\begin{figure}[h]
+  \centering
+  \begin{minipage}{0.49\textwidth}
+    \includegraphics[width=\textwidth]{assets/menu-01.png}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.49\textwidth}
+    \includegraphics[width=\textwidth]{assets/menu-02.png}
+  \end{minipage}
+  \caption{Schermata di selezione del profilo (sx) e schermata di creazione/modifica del profilo (dx).}
+\end{figure}
+La creazione del profilo avviene selezionando uno \textit{slot} libero e aprendo il pannello di editing, dove è possibile impostare il nome del giocatore
+e personalizzare alcuni aspetti dell'avatar.
+L'avatar è creato a partire dallo sprite base del giocatore, applicando dei simpatici copricapo.
+\newline
+{\small\textsf{\textcolor{codepurple}{Vedere la sezione extra~\ref{sec:extra} per maggiori dettagli e curiosità sul design degli avatar.}}}
+\newline
 
+I dati vengono memorizzati tramite \textbf{ProfileRepository} e resi disponibili alle schermate del menù
+attraverso i pannelli \textbf{ProfileSelectionPanel} e \textbf{ProfileEditorPanel}, che dialogano con il \textbf{MenuController}.
+
+\subsection{Avvio del gioco}
+Una volta selezionato il profilo, il giocatore avvia la partita: il Controller chiama il metodo di inizializzazione del \textbf{Model}, caricando il profilo selezionato in una nuova istanza di \textbf{GameData}.
+Successivamente viene istanziata la \textbf{GameView}, collegata come osservatore del Model,
+e viene avviato il game loop descritto nella sezione~\ref{sec:game_loop} relativa al Controller, che scandisce l'aggiornamento continuo dello stato di gioco.
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.6\textwidth]{assets/game_start.png}
+  \caption{Partita avviata, si gioca!}
+\end{figure}
+\newpage
+
+\subsection{Camminata, salto e motore fisico}
+Il movimento del giocatore e tramite un semplice motore fisico, come definito nella sezione~\ref{sec:movement_overview} e nella sezione~\ref{sec:game_geometry}, basato sulle classi \textbf{PhysicsState}, \textbf{Force} e \textbf{Vector2}.
+Ogni entità dinamica mantiene un vettore velocità e, nel caso del Player, una lista di forze attive, come gravità e impulso del salto.
+La classe \textbf{PhysicsState} si occupa di sommare le forze costantie di aggiornare la velocità tenendo conto del \(\Delta t\) calcolato nel game loop,
+mentre gli stati del Player (\textbf{PlayerState}) decidono quali forze applicare
+in risposta ai tasti premuti (camminata a sinistra/destra, avvio di un salto) e quando azzerare o modificare lo stato fisico (ad esempio all'ingresso in un ascensore).
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.6\textwidth]{assets/jump_force.png}
+  \caption{Forze applicate al Player al momento del salto.}
+\end{figure}
+L'impulso fornisce un'accelerazione iniziale verso l'alto, che viene poi contrastata dalla forza di gravità, portando il Player a raggiungere l'apice del salto e a ricadere verso il basso.
+
+\subsection{Gestione delle collisioni con swept AABB}
+Come fa il Player a camminare senza attraversare i muri o cadere? A tale scopo è stato implementato, come già accenato nella sezione~\ref{sec:collision_system_overview} un sistema di collisione basato su aree rettangolari denominate bounding box.
+I bounding box definiscono un perimetro attorno a ogni entità solida (muri, pavimenti, ascensori, nemici, player) che consente di rilevare se queste sono sovrapposte o meno.
+Per lo scopo corrente, ovvero evitare che il Player attraversi enitità solide durante il movimento, bisogna evitare che le bounding box si intersechino.
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.3\textwidth]{assets/bounding-box.png}
+  \caption{Bounding box del Player (in blu) e dei pavimenti sottostanti (in rosso).}
+\end{figure}
+\newline
+La gestione delle collisioni tra entità è delegata al \textbf{CollisionManager}, che utilizza un approccio basato su \textbf{swept AABB} per calcolare lo spostamento effettivo
+di un'entità in movimento. A partire dai bounds correnti e dallo spostamento desiderato, il metodo \texttt{resolvedMovement} costruisce un ``broad phase'' del movimento.
+Il broad phase è un rettangolo che racchiude l'area coperta dal movimento, e viene utilizzato per filtrare rapidamente le entità potenzialmente coinvolte nel movimento.
+Una volta filtrati i solidi, per ciascuno, si applica l'algoritmo \texttt{sweptAABB} per trovare il punto di contatto e lo scorrimento residuo lungo la superficie.
+\newline
+{\small\textsf{\textcolor{codepurple}{Si rimanda alla sezione~\ref{sec:swept_aabb_appendix} in appendice per i dettagli implementativi dell'algoritmo.}}}
+\newline
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.8\textwidth]{assets/broad_phasing.png}
+  \caption{Esempio di broad phasing.}
+\end{figure}
+
+\subsection{Baking dei collider statici}
+Per migliorare le performance dei controlli di collisione, soprattutto per verificare rapidamente la presenza di terreno sotto il giocatore o punti di appoggio,
+il \textbf{CollisionManager} supporta un passo di \textbf{baking} dei collider statici tramite il metodo \texttt{bakeStatics()}. Tutti i bounds degli oggetti che implementano
+\texttt{Static} vengono caricati in una struttura \textbf{CollisionBitmap}, che permette di effettuare query veloci (ad esempio nel metodo \texttt{getGroundY} o in \texttt{maxDisplacementOnGround})
+senza dover iterare ogni volta su tutte le entità solide.
+\newline
+{\small\textsf{\textcolor{codepurple}{Si rimanda alla sezione~\ref{sec:collision_bitmap_appendix} in appendice per i dettagli implementativi della classe \texttt{CollisionBitmap}.}}}
+
+\subsection{Altri collider: interazioni, danni e trigger}
+Oltre ai collider utilizzati per la gestione delle collisioni fisiche, esistono altri tipi di collider che permettono di gestire le interazioni tra entità.
+In questi casi, l'intersecazione di bounding box è voluta ed è utilizzata per attivare eventi di gioco, come l'utilizzo dei portali,
+la ricezione del danno oppure la possibilità di interagire con un oggetto.
+\newpage
+\subsection{Cercare collezionabili}
+Lo scopo principale del gioco è raggiungere la porta d'uscita. Per farlo è necessario decifrare una password, cercando i frammenti di punchcard nascosti negli oggetti di scena della base.
+Gli oggetti di scena ispezionabili (\textbf{Prop}/\textbf{SceneObject}) possono contenere diversi tipi di collezionabili oltre ai frammenti di punchcard (\textbf{PunchCardPiece}): si possono trovare
+\textbf{FreezePass}, \textbf{ResetPass} che offrono dei bonus spendibili una volta utilizzato un ``terminale'' (si rimanda alla sezione successiva~\ref{sec:computer_interactions}). E' da notare però che non sempre gli oggetti di scena contengono un collezionabile!
+
+Quando il giocatore interagisce con un oggetto di scena, verrà mostrata una barra di progresso, al termine della quale verrà rivelato il contenuto trovato. Se l'oggetto contiene un collezionabile,
+il Player notifica il \textbf{GameData} tramite il metodo \texttt{collectItem}, aggiornando i contatori degli oggetti raccolti.
+\begin{figure}[h]
+  \centering
+  \begin{minipage}{0.48\textwidth}
+    \centering
+    \includegraphics[width=0.5\textwidth]{assets/fridge.png} \\
+    \centering
+    \includegraphics[width=0.5\textwidth]{assets/coin.png}
+  \end{minipage}
+  \begin{minipage}{0.48\textwidth}
+    \centering
+    \includegraphics[width=0.62\textwidth]{assets/flask.png} \\
+    \centering
+    \includegraphics[width=0.62\textwidth]{assets/television.png}
+  \end{minipage}
+  \caption{Oggetti di scena ispezionabili}
+\end{figure}
+Man mano che il giocatore colleziona oggetti e frammenti di punchcard, può monitorare i progressi tramite il \textbf{display di progresso del gioco}, visibile nelle stanze dell'ascensore.
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.5\textwidth]{assets/progress.png}
+  \caption{Display di progresso}
+\end{figure}
+\newpage
+\subsection{Interagire con il computer}
+\label{sec:computer_interactions}
+I terminali \textbf{Computer} permettono al giocatore di utilizzare i collezionabili raccolti per attivare bonus.
+All'interno del gioco, esistono di due tipi bonus:
+\begin{itemize}
+  \item \textbf{Freeze enemies}: congela temporaneamente tutti i nemici nella stanza corrente.
+  \item \textbf{Reset elevators}: riporta tutti gli ascensori della stanza alle posizioni iniziali.
+\end{itemize}
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.6\textwidth]{assets/using_pc.png}
+  \caption{Utilizzo del terminale.}
+\end{figure}
+I \textbf{FreezePass} e i \textbf{ResetPass} sono collezionabili speciali che il giocatore può utilizzare per attivare i bonus di \textbf{Freeze enemies} e \textbf{Reset elevators} precedentemente elencati.
+Il \textbf{GameData} tiene traccia del numero di pass disponibili e, quando uno di essi viene usato,
+invoca i metodi del \textbf{SceneContext} corrente (ad esempio \texttt{freezeEnemies()} e \texttt{resetElevators()}) per congelare per qualche secondo i nemici nella stanza
+o per riportare gli ascensori alle posizioni iniziali.
+\subsection{Usare gli ascensori}
+Gli ascensori sono una meccanica di gioco che permette l'esplorazione verticale della base: gli ascensori all'interno delle stanze, definiti nella classe (\textbf{SmallElevator}) collegano porzioni della stessa.
+Gli ascensori principali, invece, collegano più stanze disposte su diversi piani nella \textbf{Map}. Quando il giocatore interagisce con un ascensore, entra nello stato \textbf{ElevatorPlayerState},
+in cui il movimento è delegato all'ascensore stesso tramite eventi \textbf{ObservableEntity}, fino al raggiungimento del piano di destinazione.
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.2\textwidth]{assets/small-elevators.png}
+  \caption{Ascensori all'interno delle stanze.}
+\end{figure}
+\newpage
+
+\subsection{Tipi di nemici: Robot e Sfere elettriche}
+Nel gioco sono presenti due tipologie principali di nemici: i \textbf{Robot}, che pattugliano piattaforme orizzontali e possono, con una probabilità calcolata in fase di instanziazione, sparare un raggio elettrico (\textbf{ShockRay}),
+e le \textbf{Sfere elettriche} (\textbf{ElectricBall}), che inseguono direttamente il giocatore nella stanza, ignorando ogni tipo di collisione. Entrambe le tipologie utilizzano stati
+specifici per gestire il movimento (\textbf{EnemyPatrolState} e \textbf{EnemyFollowState}),
+la logica di attacco e lo stato di congelamento, e condividono la stessa interfaccia di danno attraverso i rispettivi \texttt{damagerBounds}.
+\begin{figure}[h]
+  \centering
+  \begin{minipage}{0.49\textwidth}
+    \includegraphics[width=\textwidth]{assets/robot_attack.png}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.49\textwidth}
+    \includegraphics[width=\textwidth]{assets/electric_ball.png}
+  \end{minipage}
+  \caption{Robot a sinistra e Sfera elettrica a destra.}
+\end{figure}
+
+\subsection{Subire danno}
+Il sistema di danno si basa sulle interazioni tra entità che espongono le interfacce \texttt{Damager} e \texttt{Damageable}, gestite dai manager del Model.
+Quando il Player entra in contatto con l'area di danno di un nemico, viene attivato lo stato \textbf{DamagedPlayerState},
+che temporaneamente disabilita i controlli di movimento e, la View, avvia l'animazione ``electrify'' (vedere sezione ~\ref{sec:animations}).
+Il \textbf{GameData} tiene traccia del numero di volte che si subiscono danni e del tempo di gioco, che influenzeranno il punteggio finale.
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.6\textwidth]{assets/death_by_zap.png}
+  \caption{ZzzZZZzZZzap!}
+\end{figure}
+Al termine dello stato di danno, il Player viene riposizionato al punto di spawn della stanza corrente, e la stanza viene resettata.
+
+\subsection{Danno da caduta fuori dalla mappa}
+Per gestire la caduta del giocatore oltre i limiti della stanza, ogni \textbf{Room} genera un'area di pericolo (\textbf{HazardousArea}) posizionata sotto la mappa giocabile.
+Se i bounds del Player intersecano questa area, viene considerato come caduto fuori dallo schermo: il Model applica il danno corrispondente,
+incrementa il contatore dei danni in \textbf{GameData} e riposiziona il giocatore al punto di spawn definito dalla stanza corrente.
+
+\subsection{Porta di uscita}
+La \textbf{porta di uscita} rappresenta l'obiettivo finale della partita: è un'entità dedicata (\textbf{ExitDoor}) posizionata in una stanza specifica della base.
+L'entità fa il polling dello stato di decodifica della password tramite \textbf{GameData} verificando tramite il metodo \texttt{hasCompleteDecode()} se tutti i frammenti di punchcard sono stati raccolti.
+Con la password decodificata, la porta si apre automaticamente, permettendo al giocatore di interagire con essa per completare la partita.
+\begin{figure}[h]
+  \centering
+  \begin{minipage}{0.35\textwidth}
+    \includegraphics[width=\textwidth]{assets/exit_door_closed.png}
+  \end{minipage}
+  \begin{minipage}{0.35\textwidth}
+    \includegraphics[width=\textwidth]{assets/exit_door_open.png}
+  \end{minipage}
+  \caption{Porta di uscita chiusa (sx) e aperta (dx).}
+\end{figure}
+
+\subsection{Fine gioco e calcolo del punteggio}
+Al termine della partita, il Model invoca \texttt{completeGame()}, che segna la partita come completata tramite \textbf{GameData} e delega il calcolo del punteggio finale.
+La formula tiene conto del numero totale di oggetti raccolti, del tempo impiegato rispetto a un tempo atteso di completamento e del numero di volte che il giocatore ha subito danni,
+premiando le partite rapide, con molti oggetti raccolti e con pochi danni subiti. Il profilo del giocatore viene quindi aggiornato tramite \textbf{ProfileRepository},
+registrando il punteggio se è migliore del precedente, e aumentando il contatore delle vittorie.
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.6\textwidth]{assets/end.png}
+  \caption{Riepilogo del punteggio finale.}
+\end{figure}
+
+\subsection{Extra: creazione avatar ed effetto scanline}
+\label{sec:extra}
+Il progetto include alcune funzionalità extra, che arricchiscono l'esperienza di gioco e richiamano l'estetica del gioco originale.
+\subsubsection{Scanline}
+Se Java ha abilitato la proprietà \texttt{sun.java2d.opengl}, viene applicato un effetto grafico di tipo \textbf{scanline} per richiamare l'aspetto dei monitor CRT.
+L'effetto è realizzato tramite il metodo \texttt{ImageEffects.createScanline}, che genera
+un'overlay semi-trasparente con linee orizzontali alternante, sovrapposta al rendering della scena per simulare le righe del vecchio schermo televisivo.
+Tuttavia, utilizzando la libreria Java Swing, l'effetto può causare un calo delle prestazioni, pertanto è necessario che OpenGL sia supportato e abilitato per poterne usufruire.
+\begin{figure}[h]
+  \centering
+  \begin{minipage}{0.38\textwidth}
+    \includegraphics[width=\textwidth,draft=false]{assets/scanline_off.png}
+  \end{minipage}
+  \begin{minipage}{0.4\textwidth}
+    \includegraphics[width=\textwidth,draft=false]{assets/scanline_on.png}
+  \end{minipage}
+  \caption{Effetto di scanline disabilitato (sx) e abilitato (dx).}
+\end{figure}
+
+\subsubsection{Creazione avatar}
+Durante la creazione del profilo, il giocatore può personalizzare il proprio avatar scegliendo tra diversi copricapo.
+Le personalizzazioni sono state realizzate a partire dallo \textbf{sprite del player} andando a separare il layer del corpo da quello della testa.
+La testa è stata modificata frame per frame, per comporre i vari copricapo per ogni frame delle animazioni, mantenendo comunque lo stile grafico originale. La testa viene poi sovrapposta durante
+la selezione dell'avatar e passata all'interno del gioco tramite il profilo.
+\begin{figure}[h]
+  \centering
+  \begin{minipage}{0.23\textwidth}
+    \centering
+    \includegraphics[width=1\textwidth]{assets/avatar-01.png} \\
+    \centering
+    \includegraphics[width=1\textwidth]{assets/avatar-02.png}
+  \end{minipage}
+  \begin{minipage}{0.23\textwidth}
+    \centering
+    \includegraphics[width=1\textwidth]{assets/avatar-03.png} \\
+    \centering
+    \includegraphics[width=1\textwidth]{assets/avatar-04.png}
+  \end{minipage}
+  \begin{minipage}{0.23\textwidth}
+    \centering
+    \includegraphics[width=1\textwidth]{assets/avatar-05.png} \\
+    \centering
+    \includegraphics[width=1\textwidth]{assets/avatar-06.png}
+  \end{minipage}
+  \begin{minipage}{0.23\textwidth}
+    \centering
+    \includegraphics[width=1\textwidth]{assets/avatar-07.png} \\
+    \centering
+    \includegraphics[width=1\textwidth]{assets/avatar-08.png}
+  \end{minipage}
+  \caption{Avatar disponibili! Alcuni sono molto familiari...}
+\end{figure}
+\newpage
+\section{Conclusioni}
+Il progetto ha rappresentato una sfida interessante, che ha messo in luce i principali problemi legati allo sviluppo del software, e le soluzioni che possono essere applicate caso per caso.
+L'adozione del pattern MVC ha contribuito a mantenere una separazione netta tra logica di gioco e interfaccia utente, contribuendo a mantenere il progetto organizzato, nonostante la moltitudine di classi gestite.
+Pattern come State hanno facilitato ampiamente la gestione di comportamenti complessi, separando e isolando logiche che altrimenti sarebbero state inserite in lunghe porzioni di codice poco manutenibile e difficilmente estendibile.
+L'Observer pattern ha permesso di creare un flusso di dati reattivo tra Model e View, rinforzando ulteriormente la separazione tra i package e favorendo il decoupling.
+Infine, è risultato essenziale applicare i principi della programmazione orientata agli oggetti, come astrazione e composizione, sfruttando quindi interfacce, 
+ereditarietà e classi astratte per creare entità flessibili e riutilizzabili.
+\newpage
 \appendix
 \section{Appendice}
 Dettagli tecnici aggiuntivi.
+
+\subsection{Sistema audio: SfxData e AudioAnimationPlayer}
+\label{sec:audio_system_appendix}
+In questa sezione sono raccolti i dettagli implementativi principali del sistema audio.
+\textbf{SfxData} si occupa di creare e gestire i pool di clip a partire dai file audio di risorsa, mentre \textbf{AudioAnimationPlayer}
+coordina gli eventi audio con gli stati e i frame delle animazioni.
+
+Di seguito si riporta la parte principale dell'implementazione di \texttt{SfxData}, relativa alla creazione dei pool e alla scelta della clip successiva:
+
+\begin{lstlisting}[language=Java]
+public class SfxData {
+  private final List<List<Clip>> soundPools;
+  private final boolean loop;
+  private final boolean shuffle;
+  private final boolean interruptible;
+
+  private int currentPoolIdx;
+
+  private final Random random = new Random();
+
+  private SfxData(List<List<Clip>> soundPools, boolean loop, boolean shuffle, boolean interruptible) {
+    this.soundPools = soundPools;
+    this.loop = loop;
+    this.shuffle = shuffle;
+    this.interruptible = interruptible;
+  }
+
+  public static SfxData fromFiles(boolean loop, boolean shuffle, boolean interruptible, int poolSize,
+                  String... filenames) {
+    List<List<Clip>> allPools = new ArrayList<>();
+
+    for (String filename : filenames) {
+      List<Clip> clipPool = new ArrayList<>();
+      for (int i = 0; i < poolSize; i++) {
+        Clip clip = ClipLoader.load(filename);
+        clipPool.add(clip);
+      }
+      if (!clipPool.isEmpty()) {
+        allPools.add(clipPool);
+      }
+    }
+    return new SfxData(allPools, loop, shuffle, interruptible);
+  }
+
+  public Clip nextAvailableClip() {
+    if (soundPools.isEmpty())
+      return null;
+
+    if (shuffle && soundPools.size() > 1) {
+      currentPoolIdx = random.nextInt(soundPools.size());
+    } else {
+      currentPoolIdx = (currentPoolIdx + 1) % soundPools.size();
+    }
+    List<Clip> selectedPool = soundPools.get(currentPoolIdx);
+
+    if (selectedPool.isEmpty())
+      return null;
+
+    for (Clip clip : selectedPool) {
+      if (!clip.isRunning()) {
+        return clip;
+      }
+    }
+
+    Clip forcedClip = selectedPool.getFirst();
+    if (isInterruptible()) {
+      forcedClip.stop();
+      forcedClip.setFramePosition(0);
+    }
+    return forcedClip;
+  }
+
+  public boolean isLoop() {
+    return loop;
+  }
+
+  public boolean isInterruptible() {
+    return interruptible;
+  }
+}
+\end{lstlisting}
+
+Per quanto riguarda l'integrazione con il sistema di animazioni, la classe \textbf{AudioAnimationPlayer} reagisce ai cambi di frame e di stato
+tramite i metodi \texttt{onFrameChanged} e \texttt{onStateChanged} mostrati di seguito:
+
+\begin{lstlisting}[language=Java]
+public class AudioAnimationPlayer<S extends State> extends AudioPlayer
+    implements AnimationListener<S> {
+
+  private final Map<Class<? extends S>, SfxData> stateLoopSounds = new HashMap<>();
+  private final Map<Class<? extends S>, Map<Integer, SfxData>> frameSounds = new HashMap<>();
+  private final Map<Class<? extends S>, Map<Class<? extends S>, SfxData>> transitionSounds = new HashMap<>();
+
+  private Class<? extends State> lastStateClass;
+  private int lastFrameIndex = -1;
+
+  @Override
+  public void onFrameChanged(S state, int frameIndex) {
+    if (state == null)
+      return;
+
+    if (state.getClass().equals(lastStateClass) && lastFrameIndex == frameIndex)
+      return;
+
+    lastStateClass = state.getClass();
+    lastFrameIndex = frameIndex;
+
+    Class<? extends State> stateClass = state.getClass();
+    Map<Integer, SfxData> framesMap = frameSounds.get(stateClass);
+
+    if (framesMap != null) {
+      SfxData frameData = framesMap.get(frameIndex);
+      if (frameData != null) {
+        playOneShot(frameData);
+      }
+    }
+  }
+
+  @Override
+  public void onStateChanged(S oldState, S newState) {
+    stopCurrentLoop();
+
+    if (newState == null)
+      return;
+
+    Class<? extends State> newClass = newState.getClass();
+    SfxData loopData = stateLoopSounds.get(newClass);
+
+    if (loopData != null && loopData.isLoop()) {
+      playLoop(loopData);
+    }
+
+    if (oldState == null)
+      return;
+
+    SfxData sfx = null;
+
+    if (!oldState.getClass().equals(newState.getClass())) {
+      var fromAnyTransition = transitionSounds.get(null);
+      if (fromAnyTransition != null) {
+        var sound = fromAnyTransition.get(newState.getClass());
+        if (sound != null)
+          sfx = sound;
+      }
+
+      var toAnyTransition = transitionSounds.get(oldState.getClass());
+      if (toAnyTransition != null) {
+        var sound = toAnyTransition.get(null);
+        if (sound != null)
+          sfx = sound;
+      }
+    }
+
+    var transition = transitionSounds.get(oldState.getClass());
+    if (transition != null) {
+      var sound = transition.get(newState.getClass());
+      if (sound != null)
+        sfx = sound;
+    }
+
+    if (sfx != null)
+      playOneShot(sfx);
+  }
+}
+\end{lstlisting}
+\subsection{Sistema di scene: Map, Room, SceneManager e SceneContext}
+\label{sec:scene_system_appendix}
+In questa sezione sono raccolti i dettagli principali dell'implementazione del sistema di scene,
+che collega la mappa logica della base (\texttt{Map}), i layout delle stanze (\texttt{Room}) e la gestione del contesto di gioco (\texttt{SceneManager} e \texttt{SceneContext}).
+
+La classe \textbf{Map} carica da file una rappresentazione testuale della base, in cui ogni carattere rappresenta un tipo di stanza (vuota, normale, con uscita, ascensore ecc.):
+
+  \begin{lstlisting}[language=Java]
+  public class Map {
+    private static final int WORLD_WIDTH = 8;
+    private static final int WORLD_HEIGHT = 5;
+
+    /** Matrice di tipi di stanza che rappresenta la mappa. */
+    private final RoomType[][] rooms;
+
+    public static Map fromFile(String filePath) throws IOException {
+      RoomType[][] map = createEmptyRooms();
+      try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+        String line;
+        int row = 0;
+        while ((line = br.readLine()) != null && row < WORLD_HEIGHT) {
+          line = line.replace(" ", "");
+          for (int col = 0; col < Math.min(line.length(), WORLD_WIDTH); col++) {
+            map[row][col] = RoomType.fromChar(line.charAt(col));
+          }
+          row++;
+        }
+      }
+      return new Map(map);
+    }
+  }
+  \end{lstlisting}
+
+Il metodo \texttt{generateScenes(SceneManager)} di \textbf{Map} scorre questa matrice e, per ogni cella non vuota, costruisce un \texttt{SceneBuilder} a partire da un file di stanza
+oppure da una colonna dell'ascensore principale, collegando tra loro le scene adiacenti tramite portal e registrando le destinazioni dei piani dell'ascensore.
+
+La classe \textbf{Room} gestisce invece il parsing del layout ASCII di una singola stanza e la generazione delle entità corrispondenti:
+
+  \begin{lstlisting}[language=Java]
+  public class Room {
+    public static Room fromFile(String filePath, int mapWidth, int mapHeight) throws IOException {
+      TileType[][] map = initializeMap(mapWidth, mapHeight);
+      try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+        String line;
+        int row = 0;
+        while ((line = br.readLine()) != null && row < mapHeight) {
+          line = line.replace(" ", "");
+          for (int col = 0; col < Math.min(line.length(), mapWidth); col++) {
+            map[row][col] = TileType.fromChar(line.charAt(col));
+          }
+          row++;
+        }
+      }
+      return new Room(map, filePath);
+    }
+
+    public List<Entity> generateEntities() {
+      List<Entity> res = new ArrayList<>();
+      boolean[][] processedPortals = new boolean[mapHeight][mapWidth];
+
+      for (int y = 0; y < mapHeight; y++) {
+        for (int x = 0; x < mapWidth; x++) {
+          switch (map[y][x]) {
+            case TileType.WALL -> res.add(new Wall(indexToWorldPoint(x, y, TILE_SIZE)));
+            case TileType.FLOOR -> res.add(new Floor(indexToWorldPoint(x, y, TILE_SIZE)));
+            case TileType.ENEMY_ROBOT -> res.add(new Robot(indexToWorldPoint(x, y, ENTITY_SIZE, 0, 8)));
+            // ... altri casi per nemici, portal, ascensori, oggetti di scena, uscita ...
+          }
+        }
+      }
+
+      // Area per danneggiare il player quando cade fuori dalla mappa
+      res.add(new HazardousArea(new Bounds(-1000, 1200, 2000, 1300)));
+      return res;
+    }
+  }
+  \end{lstlisting}
+
+Una volta costruite le scene, lo \textbf{SceneManager} viene inizializzato passando il \texttt{Player} principale e caricando la mappa:
+
+  \begin{lstlisting}[language=Java]
+  public class SceneManager {
+    private final List<SceneContext> scenes;
+    private SceneContext currentContext;
+    private final Player player;
+
+    public SceneManager(Player player) {
+      Map map;
+      try {
+        map = Map.fromFile("resources/room_types/map.txt");
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+
+      scenes = map.generateScenes(this);
+      this.player = player;
+      setCurrentContext(scenes.get(0));
+    }
+
+    public void setCurrentContext(SceneContext sceneContext) {
+      if (currentContext != null) {
+        currentContext.onExit(player);
+      }
+
+      SceneContext from = currentContext;
+      currentContext = sceneContext;
+      currentContext.onEnter(player, from);
+    }
+  }
+  \end{lstlisting}
+
+Il metodo \texttt{setCurrentContext} incapsula il ciclo di vita di cambio scena: prima notifica l'uscita dalla scena corrente (\texttt{onExit}),
+poi attiva la scena successiva invocando \texttt{onEnter} e passando il player e la scena di provenienza, così da poter calcolare correttamente lo spawn.
+
+Infine, la classe \textbf{SceneContext} rappresenta il vero e proprio ``contenitore logico'' di una scena, con i suoi manager e le code per spawn/rimozione sicuri:
+
+  \begin{lstlisting}[language=Java]
+  public class SceneContext {
+    private final SceneManager sceneManager;
+    private final EntityManager entityManager;
+    private final CollisionManager collisionManager;
+    private final InteractionManager interactionManager;
+    private final DamageManager damageManager;
+
+    private final List<Entity> toRemove = new ArrayList<>();
+    private final List<Entity> toAdd = new ArrayList<>();
+
+    private SceneContext nextScene = null;
+    private Map<SceneContext, Portal> scenePortal;
+
+    public void updateContext() {
+      toAdd.forEach(entityManager::add);
+      toAdd.clear();
+      toRemove.forEach(entityManager::remove);
+      toRemove.clear();
+      if (this.nextScene != null) {
+        sceneManager.setCurrentContext(nextScene);
+        this.nextScene = null;
+      }
+    }
+
+    public void onEnter(Player player, SceneContext fromScene) {
+      if (!scenePortal.isEmpty()) {
+        Portal p = scenePortal.getOrDefault(fromScene, entityManager.getPortals().getFirst());
+        Point spawnPosition = p != null
+          ? p.getSpawnPosition(player.getEntityBounds())
+          : new Point(100, 400);
+        player.onRoomEnter(spawnPosition);
+      }
+
+      entityManager.add(player);
+      bakeColliders();
+    }
+
+    public void onExit(Player player) {
+      entityManager.getEntities().forEach(Entity::onRoomLeave);
+      removeEntity(player);
+      releaseColliders();
+    }
+  }
+  \end{lstlisting}
+
+In questo modo il Model, ad ogni chiamata a \texttt{updateGameState}, può lavorare sempre e solo sul \texttt{SceneContext} corrente,
+senza dover conoscere i dettagli delle transizioni o della struttura complessiva della mappa.
 
 \subsection{Struttura StepList e StepIterator}
 \label{sec:steplist}
@@ -986,6 +1667,179 @@ public class StepList<T> extends ArrayList<T> {
   }
 }
 \end{lstlisting}
+
+\subsection{CollisionBitmap e baking dei collider statici}
+\label{sec:collision_bitmap_appendix}
+In questa sezione sono riportati i dettagli implementativi principali relativi al \textbf{baking} dei collider statici
+e all'uso della struttura \textbf{CollisionBitmap} da parte del \textbf{CollisionManager}, come descritto nella sezione dedicata alle meccaniche di gioco.
+
+La classe \textbf{CollisionBitmap} implementa una bitmap bidimensionale compatta, in cui ogni bit rappresenta la presenza o assenza
+di un punto solido nello spazio di gioco. Per motivi di efficienza, la griglia viene "sdraiata" in un array monodimensionale di \texttt{long},
+in modo da poter effettuare set/get di singoli punti usando semplici operazioni di bit shifting:
+
+\begin{lstlisting}[language=Java]
+public class CollisionBitmap {
+  private final int H = 800;
+  private final int W = 1280;
+  // Ogni long contiene 64 bit; la bitmap e' quindi W*H bit complessivi
+  private final long[] bits = new long[(int) Math.ceil((double) (H * W) / 64)];
+
+  private void set(int x, int y) {
+    if (x < 0 || y < 0 || x >= W || y >= H)
+      return;
+
+    int fullIndex = y * W + x;      // indice assoluto nel piano
+    int idx = fullIndex >> 6;       // indice nell'array (equivale a / 64)
+    int position = fullIndex & 63;  // posizione nel long (equivale a % 64)
+    bits[idx] |= (1L << position);  // accende il bit corrispondente
+  }
+
+  public boolean get(int x, int y) {
+    if (x < 0 || y < 0 || x >= W || y >= H)
+      return false;
+
+    int fullIndex = y * W + x;
+    int idx = fullIndex >> 6;
+    int position = fullIndex & 63;
+    // Controlla se il bit e' presente
+    return (bits[idx] & (1L << position)) != 0;
+  }
+
+  public void loadBounds(Bounds bounds) {
+    int x1 = Math.max(0, bounds.left());
+    int y1 = Math.max(0, bounds.top());
+
+    int x2 = Math.min(W - 1, x1 + bounds.width());
+    int y2 = Math.min(H - 1, y1 + bounds.height());
+
+    for (int y = y1; y <= y2; y++) {
+      for (int x = x1; x <= x2; x++) {
+        set(x, y);
+      }
+    }
+  }
+}
+\end{lstlisting}
+
+Il \textbf{CollisionManager} utilizza questa bitmap per fare "baking" in anticipo i collider statici, caricando i bounds di tutte le entita' che implementano \texttt{Static}
+e sfruttando poi query rapide (ad esempio per verificare la presenza di terreno o il massimo spostamento orizzontale consentito):
+
+\begin{lstlisting}[language=Java]
+public class CollisionManager {
+  private final EntityManager entityManager;
+  private CollisionBitmap collisionBitmap;
+
+  public void bakeStatics() {
+    collisionBitmap = new CollisionBitmap();
+    getSolids().stream()
+      .filter(solid -> solid instanceof Static)
+      .forEach(solid -> collisionBitmap.loadBounds(solid.getBounds()));
+  }
+
+  private boolean isPointColliding(Point p) {
+    return collisionBitmap.get(p);
+  }
+
+  public Point maxDisplacementOnGround(Bounds current, Point mov) {
+    int desiredHorizontal = mov.x();
+    int direction = Integer.signum(desiredHorizontal);
+    if (direction == 0) {
+      return new Point(0, mov.y());
+    }
+
+    Point start = (direction > 0
+      ? current.bottomRight()
+      : current.bottomLeft()).add(0, 1);
+
+    int maxDisplacement = 0;
+    for (int step = 1; step <= Math.abs(desiredHorizontal); step++) {
+      Point testPoint = start.add(direction * step, 0);
+      if (!isPointColliding(testPoint)) {
+        break;
+      }
+      maxDisplacement = step;
+    }
+    return new Point(maxDisplacement * direction, mov.y());
+  }
+}
+\end{lstlisting}
+In questo modo, le operazioni piu' frequenti legate al controllo del terreno possono evitare di iterare ogni volta su tutti i collider solidi,
+delegando il lavoro a semplici accessi alla bitmap in memoria.
+
+\subsection{Algoritmo swept AABB nel CollisionManager}
+\label{sec:swept_aabb_appendix}
+In questa sezione vengono riportati i dettagli implementativi dell'algoritmo di \textbf{swept AABB} utilizzato dal \textbf{CollisionManager}
+per calcolare il movimento di un'entita' in presenza di ostacoli rettangolari allineati agli assi.
+
+Per lo studio teorico della tecnica e delle formule di base è stato fatto riferimento del sito web Amanotes \textbf{\href{https://www.amanotes.com/post/using-swept-aabb-to-detect-and-process-collision}{Using swept AABB to detect and process collision}}.
+
+L'idea di base e' la seguente: dato un rettangolo (il bounding box dell'entità) e uno spostamento desiderato $\Delta x, \Delta y$,
+si considera il movimento come una traiettoria continua nel tempo $t$. Per ogni ostacolo rettangolare si calcolano i tempi di ``entrata''
+e ``uscita'' dalla collisione lungo ciascun asse, e si determina il primo istante in cui avviene la collisione.
+
+La funzione \texttt{resolvedMovement} del \textbf{CollisionManager} costruisce il \emph{broad phase} del movimento, un rettangolo che contiene
+l'area coperta dallo spostamento, e filtra i soli collider che intersecano questo rettangolo. Per ciascuno di essi viene poi chiamato il metodo privato
+\texttt{sweptAABB}, che implementa il test di collisione e restituisce lo spostamento risolto:
+
+\begin{lstlisting}[language=Java]
+private Point sweptAABB(Bounds current, Point mov, Bounds other) {
+  float dxEntry, dxExit; // distanze di entrata/uscita sull'asse X
+  float dyEntry, dyExit; // distanze di entrata/uscita sull'asse Y
+
+  if (mov.x() > 0) {
+    dxEntry = other.left() - current.right();
+    dxExit = other.right() - current.left();
+  } else {
+    dxEntry = other.right() - current.left();
+    dxExit = other.left() - current.right();
+  }
+
+  if (mov.y() > 0) {
+    dyEntry = other.top() - current.bottom();
+    dyExit = other.bottom() - current.top();
+  } else {
+    dyEntry = other.bottom() - current.top();
+    dyExit = other.top() - current.bottom();
+  }
+
+  float txEntry = (mov.x() == 0) ? Float.NEGATIVE_INFINITY : dxEntry / mov.x();
+  float txExit  = (mov.x() == 0) ? Float.POSITIVE_INFINITY : dxExit  / mov.x();
+  float tyEntry = (mov.y() == 0) ? Float.NEGATIVE_INFINITY : dyEntry / mov.y();
+  float tyExit  = (mov.y() == 0) ? Float.POSITIVE_INFINITY : dyExit  / mov.y();
+
+  float entryTime = Math.max(txEntry, tyEntry); // primo istante di collisione
+  float exitTime  = Math.min(txExit, tyExit);   // istante di uscita dalla collisione
+
+  // Se non esiste un intervallo di tempo valido, non c'e' collisione
+  if (entryTime > exitTime || entryTime < 0.0f || entryTime > 1.0f) {
+    return mov;
+  }
+
+  // Movimento fino al punto di contatto
+  float moveToContactX = mov.x() * entryTime;
+  float moveToContactY = mov.y() * entryTime;
+
+  float remainingTime = 1.0f - entryTime;
+  float slideX = 0, slideY = 0;
+
+  // Scorrimento lungo la superficie: si annulla la componente
+  // dell'asse su cui avviene per prima la collisione
+  if (txEntry > tyEntry) {
+    // collisione su X, si lascia scorrere su Y
+    slideY = mov.y() * remainingTime;
+  } else {
+    // collisione su Y, si lascia scorrere su X
+    slideX = mov.x() * remainingTime;
+  }
+
+  return new Point(
+    (int) (moveToContactX + slideX),
+    (int) (moveToContactY + slideY)
+  );
+}
+\end{lstlisting}
+
+In questo modo il movimento risultante porta l'entità fino al primo punto di contatto con l'ostacolo ottenendo un comportamento privo di penetrazioni visibili tra i collider.
 
 \subsection{ElevatorPlayerState}
 \label{sec:elevator_player_state}
